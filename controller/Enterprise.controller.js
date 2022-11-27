@@ -3,14 +3,14 @@ const EnterpriseModel = require('../model/Enterprise.model');
 const EmailModel = require('../model/Email.model')
 const UserModal = require("../model/User.model")
 const bcrypt = require('bcryptjs');
-const JWT = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const BlockchainModal = require('../model/Blockchain.modal');
 const ConsentModel = require('../model/Consent.model');
 
 
 
 
-//Obtener Usuar
+
 
 
 //Para crear una empresa
