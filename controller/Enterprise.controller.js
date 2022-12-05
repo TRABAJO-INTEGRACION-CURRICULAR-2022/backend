@@ -244,6 +244,37 @@ EnterpriseCtrl.login = async (req, res) => {
 }
 
 
+//Obtener usuarios con consentimiento
+
+EnterpriseCtrl.getUsers = async(req,res)=>{
+
+    let id = req.params.id
+
+    let enterprise = await EnterpriseModel.findById(id)
+
+    if(enterprise){
+        let users = await ConsentModel.find({"empresa.id":id})
+
+        if(users.length > 0){
+            res.send(users)
+        }else{
+            res.send({
+                status:"No hay usuarios"
+            })
+        }
+        
+    }else{
+        res.send({
+            status:"No existe la empresa"
+        })
+    }
+
+    
+
+    
+}
+
+
 
 
 

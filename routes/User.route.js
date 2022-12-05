@@ -1,7 +1,8 @@
 const express = require('express');
-const UserCtrl = require('../controller/User.controller');
 const router = express.Router()
 const userCtrl = require ('../controller/User.controller');
+const authToken = require("../middleware/authenticateToken")
+
 
 
 
@@ -19,7 +20,7 @@ router.put('/update/:id', userCtrl.updateUser)
 router.post('/login', userCtrl.login)
 
 //obtener todos los mails
-router.get('/emails/:id', userCtrl.getEmails)
+router.get('/emails/:id',authToken, userCtrl.getEmails)
 
 //aceptar todos los permios
 router.put('/aceptAll/:id',userCtrl.acceptAllConsent)
