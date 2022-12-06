@@ -12,7 +12,14 @@ const EmailSchema = new Schema({
         name:{type: String }
     },
     descripcionConcentimiento: { type: String},
-    permisos: [{tipo: {type: String}, valor: {type:Boolean}}],
+    data:[{tipo: {type: String},valor:{type:String}}],
+    permisos: [{
+        tipo: {type: String}, 
+        valor: {type:Boolean},
+        descripcion:{type:String},
+        data:[{type:String}],
+      
+        }],
     fechaFin:{type:String},
     obsevaciones: { type: String},
     respondido:{type: Boolean, default: false},

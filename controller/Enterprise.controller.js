@@ -121,7 +121,7 @@ EnterpriseCtrl.updateEnterprise = async (req, res) => {
 //Enviar email a un usuario
 EnterpriseCtrl.sendEmail = async (req, res) => {
 
-    let { email, descripcionConsentimeinto, permisos , fechaFin, observaciones } = req.body;
+    let { email, descripcionConsentimeinto, permisos ,data, fechaFin, observaciones } = req.body;
 
     console.log(permisos)
     var idEmpresa = req.params.id
@@ -148,6 +148,7 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
                         name: usuario.name
                     },
                     idUsuario: idUsuario,
+                    data:data,
                     descripcionConcentimiento: descripcionConsentimeinto,
                     permisos: permisos,
                     fechaFin: fechaFin,

@@ -11,7 +11,14 @@ const ConsetSchema = new Schema({
         id: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'user'},
         name:{type: String }
     },
-    permisos: [{tipo: {type: String}, valor: {type:Boolean}}],
+    data:[{tipo: {type: String},valor:{type:String}}],
+    permisos: [{
+        tipo: {type: String}, 
+        valor: {type:Boolean},
+        descripcion:{type:String},
+        data:[{type:String}],
+        
+        }],
     fechaModificacion: {type: String},
     fechaFinConsentimeinto: {type: String}
     

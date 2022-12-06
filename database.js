@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://tesis:Tesis123@cluster0.gzew6uq.mongodb.net/test');
+mongoose.connect('mongodb://localhost:27017/tesis');
 
 
 

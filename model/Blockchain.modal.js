@@ -9,7 +9,14 @@ const BlockchainSchema = new Schema({
     heigh: { type: Number, require: [true, 'heigh'] },
     heighEnterprise: { type: Number, require: [true, 'heigh'] },
     body: { type: String, require: [true, 'body'] },
-    permisos: [{tipo: {type: String}, valor: {type:Boolean}}],
+    data:[{tipo: {type: String},valor:{type:String}}],
+    permisos: [{
+        tipo: {type: String}, 
+        valor: {type:Boolean},
+        descripcion:{type:String},
+        data:[{type:String}],
+        
+        }],
     userId: { type: mongoose.Types.ObjectId, required: true, ref: 'user' },
     enterpriseId: { type: mongoose.Types.ObjectId, required: true, ref: 'enterprise' },
     fechaModificacion: {type: String},

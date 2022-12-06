@@ -12,13 +12,15 @@ class Block {
     this.height = 0; //bloques dentro de la 
     this.heighEnterprise = 0; //bloques dentro de la cadena
     this.body = Buffer.from(JSON.stringify(data).toString("hex")); //datos para encriptarlos lo convertimos en string y en exadecimal
-    this.permisos= [{tipo: "", valor: null}],
+    this.data = [{tipo:"", valor:""}]
+    this.permisos= [{tipo: "", valor: null, descripcion:"", data:[]}],
     this.userId = ""; //idUsuario
     this.enterpriseId =""//idEmpresa
     this.fechaModificacion = ""
     this.time = 0; //Momento en que se genera este bloque.
     
   }
+
   validate() {
     const self = this; //referencia al bloque
 
