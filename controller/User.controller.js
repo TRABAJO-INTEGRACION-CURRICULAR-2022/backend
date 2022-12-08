@@ -116,6 +116,8 @@ UserCtrl.updateUser = async (req, res) => {
     let name, lastName, email, ci;
 
     for(var i =0; i< arrayCambios.length; i++){
+
+
         if(arrayCambios[i].type =="name"){
             name = arrayCambios[i].value 
         }
@@ -157,6 +159,9 @@ UserCtrl.updateUser = async (req, res) => {
 
                 for (var i = 0; i < consentimiento.length; i++) {
 
+                    if(name){
+                        consentimiento[i].usuario.name = name
+                    }
 
                     for (var j = 0; j < consentimiento[i].data.length; j++) {
                         
@@ -187,7 +192,7 @@ UserCtrl.updateUser = async (req, res) => {
                 
 
                 
-                console.log("llegue hasta quí") 
+                
 
                 for(var i  = 0; i < consentimiento.length; i++){
 
