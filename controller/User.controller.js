@@ -115,23 +115,23 @@ UserCtrl.updateUser = async (req, res) => {
 
     let name, lastName, email, ci;
 
-    for(var i =0; i< arrayCambios.length; i++){
+    for (var i = 0; i < arrayCambios.length; i++) {
 
 
-        if(arrayCambios[i].type =="name"){
-            name = arrayCambios[i].value 
+        if (arrayCambios[i].type == "name") {
+            name = arrayCambios[i].value
         }
 
-        if(arrayCambios[i].type =="lastName"){
-            lastName = arrayCambios[i].value 
+        if (arrayCambios[i].type == "lastName") {
+            lastName = arrayCambios[i].value
         }
 
-        if(arrayCambios[i].type =="email"){
-            email = arrayCambios[i].value 
+        if (arrayCambios[i].type == "email") {
+            email = arrayCambios[i].value
         }
 
-        if(arrayCambios[i].type =="ci"){
-            ci = arrayCambios[i].value 
+        if (arrayCambios[i].type == "ci") {
+            ci = arrayCambios[i].value
         }
     }
 
@@ -152,49 +152,49 @@ UserCtrl.updateUser = async (req, res) => {
 
                 await UserModel.findByIdAndUpdate(req.params.id, nuevoUsuario, { userFindAndModify: false });
 
-    
+
                 let consentimiento = await ConsentModel.find({ "usuario.id": req.params.id })
-                
-          
+
+
 
                 for (var i = 0; i < consentimiento.length; i++) {
 
-                    if(name){
+                    if (name) {
                         consentimiento[i].usuario.name = name
                     }
 
                     for (var j = 0; j < consentimiento[i].data.length; j++) {
-                        
-                        let actualData =  consentimiento[i].data[j].tipo
 
-                   
+                        let actualData = consentimiento[i].data[j].tipo
 
-                        for(var k = 0; k < arrayCambios.length; k++){
-                            
 
-                            if(actualData === arrayCambios[k].type){
+
+                        for (var k = 0; k < arrayCambios.length; k++) {
+
+
+                            if (actualData === arrayCambios[k].type) {
 
                                 //console.log("valor",arrayCambios[k].value)
-                               
+
                                 consentimiento[i].data[j].valor = arrayCambios[k].value
-                                
+
                                 await consentimiento[i].save()
                             }
 
                             //console.log("hola",consentimiento[i].data[j])
 
-                           
+
                         }
                     }
 
                 }
 
-                
 
-                
-                
 
-                for(var i  = 0; i < consentimiento.length; i++){
+
+
+
+                for (var i = 0; i < consentimiento.length; i++) {
 
                     const cadena = await BlockchainModel.find();
 
@@ -210,12 +210,12 @@ UserCtrl.updateUser = async (req, res) => {
                         userId: consentimiento[i].usuario.id,
                         enterpriseId: consentimiento[i].empresa.id,
                         fechaModificacion: strTime
-    
+
                     })
-    
+
                     const idEmpresa = consentimiento[i].empresa.id
-                   
-    
+
+
                     const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
                     const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
                     console.log("esta es el array", bloqueAnteriorEmpresaArray)
@@ -223,14 +223,20 @@ UserCtrl.updateUser = async (req, res) => {
                     let hashMainAnterior;
                     let heighEnterprise = 0
                     let bloqueAnteriorEmpresa;
-    
+
                     if (bloqueAnteriorEmpresaArray.length > 0) {
                         console.log("entre", bloqueAnteriorEmpresaArray.length)
 
                         bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
-                        hashEmpresaAnterior = null
+
                         hashMainAnterior = bloqueAnteriorEmpresa.hashMain
                         heighEnterprise = bloqueAnteriorEmpresaArray.length
+
+                        let bloquesCadena = await BlockchainModel.find({ enterpriseId: idEmpresa})
+                        if (bloquesCadena.length > 0) {
+                            let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
+                            hashEmpresaAnterior = bloqueFinal.hashEnterprise
+                        }
 
                     } else {
                         bloqueAnteriorEmpresa = null;
@@ -238,8 +244,8 @@ UserCtrl.updateUser = async (req, res) => {
                         hashMainAnterior = null
                         heighEnterprise = 0
                     }
-    
-    
+
+
                     const block = new Block({ data: blockNew });
                     const hashEnterprise = strTime + consentimiento[i].empresa.id
                     block.hashMain = SHA256(JSON.stringify(block)).toString();
@@ -253,11 +259,11 @@ UserCtrl.updateUser = async (req, res) => {
                     block.fechaModificacion = strTime
                     block.previousHashEnterprise = hashEmpresaAnterior
                     block.previousHashMain = bloqueAnterior.hashMain
-                   
-    
-                 
-    
-    
+
+
+
+
+
                     blockNew.hashMain = block.hashMain
                     blockNew.hashEnterprise = block.hashEnterprise
                     blockNew.previousHashMain = block.previousHashMain
@@ -270,17 +276,17 @@ UserCtrl.updateUser = async (req, res) => {
                     blockNew.userId = block.userId
                     blockNew.enterpriseId = block.enterpriseId
                     blockNew.fechaModificacion = strTime
-    
-                  
-    
+
+
+
                     await blockNew.save()
-    
+
 
                 }
 
-               
 
-            
+
+
 
                 res.json({
                     status: 'Usuario actualizado'
@@ -308,9 +314,9 @@ UserCtrl.updateUser = async (req, res) => {
             })
         }
 
-    }else{
+    } else {
         res.json({
-            status:"No existe el usuario"
+            status: "No existe el usuario"
         })
     }
 };
@@ -459,9 +465,15 @@ UserCtrl.acceptConsent = async (req, res) => {
                     console.log("entre", bloqueAnteriorEmpresaArray.length)
                     bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
                     console.log("bloque indivudal", bloqueAnteriorEmpresa)
-                    hashEmpresaAnterior = null
                     hashMainAnterior = bloqueAnteriorEmpresa.hashMain
                     heighEnterprise = bloqueAnteriorEmpresaArray.length
+
+                    let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.empresa.id })
+                    if (bloquesCadena.length > 0) {
+                        let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
+                        hashEmpresaAnterior = bloqueFinal.hashEnterprise
+                    }
+
                     //console.log("hash empresa, hash main", hashMain, hashEnterprise)
                 } else {
                     bloqueAnteriorEmpresa = null;
@@ -581,9 +593,10 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                         heigh: 0,
                         heighEnterprise: 0,
                         body: null,
+                        data: email.data,
                         permisos: permisosAux,
-                        userId: email.idUsuario,
-                        enterpriseId: email.idEmpresa,
+                        userId: email.usuario.id,
+                        enterpriseId: email.empresa.id,
                         fechaModificacion: strTime
 
                     })
@@ -654,16 +667,19 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                         hashEnterprise: null,
                         previousHashEnterprise: null,
                         previousHashMain: null,
-                        heigh: cadena.length,
+                        heigh: 0,
+                        heighEnterprise: 0,
                         body: null,
+                        data: email.data,
                         permisos: permisosAux,
-                        userId: email.idUsuario,
-                        enterpriseId: email.idEmpresa,
+                        userId: email.usuario.id,
+                        enterpriseId: email.empresa.id,
                         fechaModificacion: strTime
 
                     })
 
-                    const idEmpresa = email.idEmpresa
+
+                    const idEmpresa = email.empresa.id
                     //const idUsuario = email.idUsuario
 
 
@@ -687,8 +703,10 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                         //console.log("bloque anterior",bloqueAnteriorEmpresa)
                         //console.log("este es el email", email)
 
-                        let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.idEmpresa })
+                        let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.empresa.id })
+                        console.log("se supone que el otro bloque", bloquesCadena)
                         if (bloquesCadena.length > 0) {
+                            console.log("entre al if")
                             let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
                             hashEmpresaAnterior = bloqueFinal.hashEnterprise
                         }
@@ -739,7 +757,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                     await email.save()
                     await blockNew.save()
 
-                  
+
                     let newConsent = new ConsentModel({
                         empresa: {
                             id: email.empresa.id,
