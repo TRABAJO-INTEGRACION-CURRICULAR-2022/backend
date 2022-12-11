@@ -218,14 +218,14 @@ UserCtrl.updateUser = async (req, res) => {
 
                     const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
                     const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
-                    console.log("esta es el array", bloqueAnteriorEmpresaArray)
+                    //console.log("esta es el array", bloqueAnteriorEmpresaArray)
                     let hashEmpresaAnterior;
                     let hashMainAnterior;
                     let heighEnterprise = 0
                     let bloqueAnteriorEmpresa;
 
                     if (bloqueAnteriorEmpresaArray.length > 0) {
-                        console.log("entre", bloqueAnteriorEmpresaArray.length)
+                       
 
                         bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
 

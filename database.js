@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const config = require("./utils/config");
-//mongoose.connect(config.MONGODB_URI);
-mongoose.connect("mongodb://localhost:27017/tesis");
+mongoose.connect(config.MONGODB_URI);
+//mongoose.connect("mongodb://localhost:27017/tesis");
 
 const objetobd = mongoose.connection;
 
