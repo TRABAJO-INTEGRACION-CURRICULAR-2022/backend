@@ -587,7 +587,7 @@ UserCtrl.acceptConsent = async (req, res) => {
 
 
                     res.send({
-                        status: "Has aceptado todo los permisos"
+                        status: "Consentimiento guardado"
                     })
 
                 }
