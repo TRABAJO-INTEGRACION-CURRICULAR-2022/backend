@@ -332,8 +332,24 @@ UserCtrl.getEmails = async (req, res) => {
 
         let emails = await EmailModel.find({ idUsuario: user._id, respondido: false })
 
+
         if (emails) {
-            res.send(emails)
+
+            let enviarEmails = []
+
+            for(var i = 0 ; i < emails.length; i++){
+
+                enviarEmails[i] = {
+                    id: emails[i]._id,
+                    nombreEmpresa: emails[i].empresa.name,
+                    descrpcion: emails[i].descripcionConcentimiento,
+                    fechaEnvio: emails[i].fechaEnvio
+
+                }
+
+            }
+
+            res.send(enviarEmails)
         } else {
             res.json({
                 status: "No Existen Emails"
@@ -343,6 +359,22 @@ UserCtrl.getEmails = async (req, res) => {
     } else {
         res.json({
             status: "No existe el usuario"
+        })
+    }
+}
+
+UserCtrl.getEmail = async(req,res)=>{
+    var id = req.params.id
+
+    let email = await EmailModel.findById(id)
+
+
+    if(email){
+        res.send(email)
+    }else{
+        res.status(404).send({
+            status: false,
+            message: "No existe el email"
         })
     }
 }

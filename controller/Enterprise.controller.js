@@ -134,6 +134,9 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
 
         if (usuario) {
 
+            let date = new Date();
+            let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
             try {
 
                 let idUsuario = usuario._id
@@ -152,7 +155,8 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
                     descripcionConcentimiento: descripcionConsentimeinto,
                     permisos: permisos,
                     fechaFin: fechaFin,
-                    obsevaciones: observaciones
+                    obsevaciones: observaciones,
+                    fechaEnvio: strTime
 
 
 

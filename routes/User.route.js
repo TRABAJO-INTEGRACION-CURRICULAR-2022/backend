@@ -22,6 +22,10 @@ router.post('/login', userCtrl.login)
 //obtener todos los mails
 router.get('/emails/:id',authToken, userCtrl.getEmails)
 
+//obtener email
+
+router.get('/email/:id', userCtrl.getEmail)
+
 //aceptar todos los permios
 router.put('/aceptAll/:id',userCtrl.acceptAllConsent)
 

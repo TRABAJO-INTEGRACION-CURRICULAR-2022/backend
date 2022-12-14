@@ -23,6 +23,7 @@ const EmailSchema = new Schema({
     fechaFin:{type:String},
     obsevaciones: { type: String},
     respondido:{type: Boolean, default: false},
+    fechaEnvio: {type: String}
     
 });
 
