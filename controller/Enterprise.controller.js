@@ -248,6 +248,29 @@ EnterpriseCtrl.login = async (req, res) => {
 
 }
 
+//Obtener usuario
+
+EnterpriseCtrl.getUserConsent = async(req,res)=>{
+
+    let id = req.params.id
+
+    let consent = await ConsentModel.findById(id)
+
+
+    if(consent){
+        res.status(200).send({
+            status: true,
+            consent: consent,
+            message:"ok"
+        })
+    }else{
+        res.status(404).send({
+            status: false,
+            message: "No existe el consentimiento"
+        })
+    }
+
+}
 
 //Obtener usuarios con consentimiento
 
@@ -258,10 +281,23 @@ EnterpriseCtrl.getUsers = async(req,res)=>{
     let enterprise = await EnterpriseModel.findById(id)
 
     if(enterprise){
+        let usersSend  = []
         let users = await ConsentModel.find({"empresa.id":id})
 
+        for(var i = 0; i < users.length; i++){
+
+            let user = await UserModal.findById(users[i].usuario.id)
+            usersSend[i] = {
+                id_consent: users[i]._id,
+                id_user: user._id,
+                fechaFinConsentimeinto : users[i].fechaFinConsentimeinto,
+                name: user.name,
+                lastname: user.lastName
+            }
+        }
+
         if(users.length > 0){
-            res.send(users)
+            res.send(usersSend)
         }else{
             res.send({
                 status:"No hay usuarios"

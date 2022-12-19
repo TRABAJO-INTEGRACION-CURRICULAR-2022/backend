@@ -28,4 +28,10 @@ router.get("/getUsers/:id", enterpriseCtrl.getUsers)
 
 
 
+router.get("/getUserConsent/:id", enterpriseCtrl.getUserConsent)
+
+
+
+
+
 module.exports = router
