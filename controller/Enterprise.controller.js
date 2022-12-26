@@ -6,6 +6,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const BlockchainModal = require('../model/Blockchain.modal');
 const ConsentModel = require('../model/Consent.model');
+const TreatmentModel = require('../model/Treatment.model');
+var XLSX = require('xlsx');
+
 
 
 
@@ -121,7 +124,7 @@ EnterpriseCtrl.updateEnterprise = async (req, res) => {
 //Enviar email a un usuario
 EnterpriseCtrl.sendEmail = async (req, res) => {
 
-    let { email, descripcionConsentimeinto, permisos ,data, fechaFin, observaciones } = req.body;
+    let { email, descripcionConsentimeinto, permisos, data, fechaFin, observaciones } = req.body;
 
     console.log(permisos)
     var idEmpresa = req.params.id
@@ -142,16 +145,16 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
                 let idUsuario = usuario._id
 
                 const NewEmail = new EmailModel({
-                    empresa: { 
-                        id: empresa._id, 
-                        name: empresa.name 
+                    empresa: {
+                        id: empresa._id,
+                        name: empresa.name
                     },
-                    usuario: { 
+                    usuario: {
                         id: usuario._id,
                         name: usuario.name
                     },
                     idUsuario: idUsuario,
-                    data:data,
+                    data: data,
                     descripcionConcentimiento: descripcionConsentimeinto,
                     permisos: permisos,
                     fechaFin: fechaFin,
@@ -165,14 +168,14 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
                 await NewEmail.save()
 
                 res.json({
-                    status:"Email Enviado"
+                    status: "Email Enviado"
                 })
 
             } catch (error) {
                 console.log(error)
 
                 res.json({
-                    status:"Error al envíar correo"
+                    status: "Error al envíar correo"
                 })
 
             }
@@ -196,23 +199,23 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
 
 //Coger solo los emails respondidos y los permisos
 
-EnterpriseCtrl.getUsers = async(req,res)=>{
+EnterpriseCtrl.getUsers = async (req, res) => {
 
     console.log(req.params.id)
-    
-    let users = await ConsentModel.find({"empresa.id" :req.params.id})
 
-    if(users.length > 0) {
+    let users = await ConsentModel.find({ "empresa.id": req.params.id })
+
+    if (users.length > 0) {
 
         res.send(users)
 
-    }else{
+    } else {
         res.send({
-            status:"No existen consentimeintos"
+            status: "No existen consentimeintos"
         })
     }
 
-    
+
 
 }
 
@@ -225,45 +228,45 @@ EnterpriseCtrl.login = async (req, res) => {
     const enterprise = await EnterpriseModel.findOne({ email: email })
 
     const passwordCorrect = enterprise === null
-      ? false
-      : await bcrypt.compare(password, enterprise.password)
-  
+        ? false
+        : await bcrypt.compare(password, enterprise.password)
+
     if (!(enterprise && passwordCorrect)) {
-      return res.status(401).json({
-        error: 'correo o contraseña invalida'
-      })
+        return res.status(401).json({
+            error: 'correo o contraseña invalida'
+        })
     }
-  
+
     const enterpriseForToken = {
-      email: enterprise.email,
-      id: enterprise._id,
-      name: enterprise.name
+        email: enterprise.email,
+        id: enterprise._id,
+        name: enterprise.name
     }
-  
+
     const token = jwt.sign(enterpriseForToken, "secreto")
-  
+
     res
-      .status(200)
-      .send({ token, enterprise })
+        .status(200)
+        .send({ token, enterprise })
 
 }
 
 //Obtener usuario
 
-EnterpriseCtrl.getUserConsent = async(req,res)=>{
+EnterpriseCtrl.getUserConsent = async (req, res) => {
 
     let id = req.params.id
 
     let consent = await ConsentModel.findById(id)
 
 
-    if(consent){
+    if (consent) {
         res.status(200).send({
             status: true,
             consent: consent,
-            message:"ok"
+            message: "ok"
         })
-    }else{
+    } else {
         res.status(404).send({
             status: false,
             message: "No existe el consentimiento"
@@ -274,45 +277,246 @@ EnterpriseCtrl.getUserConsent = async(req,res)=>{
 
 //Obtener usuarios con consentimiento
 
-EnterpriseCtrl.getUsers = async(req,res)=>{
+EnterpriseCtrl.getUsers = async (req, res) => {
 
     let id = req.params.id
 
     let enterprise = await EnterpriseModel.findById(id)
 
-    if(enterprise){
-        let usersSend  = []
-        let users = await ConsentModel.find({"empresa.id":id})
+    if (enterprise) {
+        let usersSend = []
+        let users = await ConsentModel.find({ "empresa.id": id })
 
-        for(var i = 0; i < users.length; i++){
+        for (var i = 0; i < users.length; i++) {
 
             let user = await UserModal.findById(users[i].usuario.id)
             usersSend[i] = {
                 id_consent: users[i]._id,
                 id_user: user._id,
-                fechaFinConsentimeinto : users[i].fechaFinConsentimeinto,
+                fechaFinConsentimeinto: users[i].fechaFinConsentimeinto,
                 name: user.name,
                 lastname: user.lastName
             }
         }
 
-        if(users.length > 0){
+        if (users.length > 0) {
             res.send(usersSend)
-        }else{
+        } else {
             res.send({
-                status:"No hay usuarios"
+                status: "No hay usuarios"
             })
         }
-        
-    }else{
+
+    } else {
         res.send({
-            status:"No existe la empresa"
+            status: "No existe la empresa"
         })
     }
 
-    
 
-    
+
+
+}
+
+
+//Crear tratamiento
+
+EnterpriseCtrl.createTreatment = async (req, res) => {
+
+    let id = req.params.id
+
+    let enterprise = await EnterpriseModel.findById(id)
+
+    if (enterprise) {
+
+
+
+        let { name, data } = req.body
+
+        let treatment = await TreatmentModel.findOne({ name: name })
+
+
+
+        if (treatment) {
+            res.status(400).send({
+                status: false,
+                message: "Ya existe el tratamiento"
+            })
+        } else {
+
+            const NewData = new TreatmentModel({
+                name: name,
+                data: data,
+                enterpriseId: id
+
+            })
+
+            await NewData.save();
+
+            res.status(200).send({
+                status: true,
+                message: "Tratamiento creado"
+            })
+        }
+    } else {
+
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+    }
+
+}
+
+
+//Actualziar tratamiento
+
+EnterpriseCtrl.updateTreatment = async (req, res) => {
+
+
+    let id = req.params.id
+
+    let treatment = await TreatmentModel.findById(id)
+
+
+    if (treatment) {
+
+        let { name, data } = req.body
+
+        const newTreeatment = {
+            name,
+            data,
+        };
+
+
+        if (name === treatment.name) {
+
+            await TreatmentModel.findByIdAndUpdate(req.params.id, newTreeatment);
+            res.status(200).send({
+                status: true,
+                message: 'Tratamiento Actualizado'
+            });
+
+        } else if (!treatment) {
+
+            await TreatmentModel.findByIdAndUpdate(req.params.id, newTreeatment);
+            res.status(200).send({
+                status: true,
+                message: 'Tratamiento Actualizado'
+            });
+
+        } else {
+
+            res.status(400).send({
+                status: false,
+                message: 'El nombre del tratamiento ya existe'
+            });
+
+        }
+
+
+
+
+
+    } else {
+        res.status(400).send({
+            status: false,
+            message: "No existe el tratamiento"
+        })
+    }
+}
+
+//Obtener tratamientos
+
+EnterpriseCtrl.getTreatments = async (req, res) => {
+
+    let id = req.params.id
+
+    let enterprise = await EnterpriseModel.findById(id)
+
+    if (enterprise) {
+
+        let treatments = await TreatmentModel.find({ enterpriseId: id })
+
+        res.status(200).send({
+            status: true,
+            treatments: treatments
+        })
+
+
+    } else {
+
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+
+        })
+
+    }
+
+}
+
+
+//Obtener tratamiento
+
+EnterpriseCtrl.getTreatment = async (req, res) => {
+
+    let id = req.params.id
+
+    let treatment = await TreatmentModel.findById(id)
+
+    if (treatment) {
+
+        res.status(200).send({
+            status: true,
+            treatment: treatment
+        })
+
+    } else {
+        res.status(400).send({
+            status: false,
+            message: "No existe el tratamiento"
+        })
+    }
+}
+
+
+//Descargar historial
+
+EnterpriseCtrl.exportData = async (req, res) => {
+
+    let enterpriseId = req.params.enterpriseId
+    let userId = req.params.userId
+
+    let enterprise = await EnterpriseModel.findById(enterpriseId)
+
+    if (!enterprise) {
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+    }
+
+    let user = await UserModal.findById(userId)
+
+    if (!user) {
+        res.status(400).send({
+            status: false,
+            message: "No existe el usuario"
+        })
+    }
+
+
+    let blockchain = await BlockchainModal.find({ userId: userId, enterpriseId: enterpriseId })
+    var wb = XLSX.utils.book_new(); //new workbook
+    var temp = JSON.stringify(blockchain);
+    temp = JSON.parse(temp);
+    var ws = XLSX.utils.json_to_sheet(temp);
+    var down = __dirname + '/public/exportdata.xlsx'
+    XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+    XLSX.writeFile(wb, down);
+    res.download(down);
+
 }
 
 

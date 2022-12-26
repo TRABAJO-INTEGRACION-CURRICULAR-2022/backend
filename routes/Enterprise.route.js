@@ -27,8 +27,26 @@ router.post('/createEmail/:id', enterpriseCtrl.sendEmail)
 router.get("/getUsers/:id", enterpriseCtrl.getUsers)
 
 
-
+//Obtener usuario
 router.get("/getUserConsent/:id", enterpriseCtrl.getUserConsent)
+
+//crear tratamiento
+router.post("/createTreatment/:id", enterpriseCtrl.createTreatment)
+
+//Actualizar tratamiento
+
+router.put("/updateTreatment/:id", enterpriseCtrl.updateTreatment)
+
+//Obtener tratamientos
+
+router.get("/getTreatments/:id", enterpriseCtrl.getTreatments)
+
+//Obtener tratamiento
+router.get("/getTreatment/:id", enterpriseCtrl.getTreatment)
+
+//descargar historial
+
+router.get("/exportData/:enterpriseId/:userId", enterpriseCtrl.exportData)
 
 
 
