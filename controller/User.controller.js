@@ -388,7 +388,7 @@ UserCtrl.acceptConsent = async (req, res) => {
 
     var email = await EmailModel.findById(idEmail)
 
-    var {permisos} = req.body
+    var {permisos, data} = req.body
 
     if(!permisos){
 
@@ -432,7 +432,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                         heigh: 0,
                         heighEnterprise: 0,
                         body: null,
-                        data: email.data,
+                        data: data,
                         permisos: permisosAux,
                         userId: email.usuario.id,
                         enterpriseId: email.empresa.id,
@@ -485,7 +485,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                             name: email.usuario.name
                         },
                         permisos: permisosTrue,
-                        data: email.data,
+                        data: data,
                         fechaModificacion: strTime,
                         fechaFinConsentimeinto: email.fechaFin
                     })
@@ -509,7 +509,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                         heigh: 0,
                         heighEnterprise: 0,
                         body: null,
-                        data: email.data,
+                        data: data,
                         permisos: permisosAux,
                         userId: email.usuario.id,
                         enterpriseId: email.empresa.id,
@@ -607,7 +607,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                             name: email.usuario.name
                         },
                         permisos: permisosTrue,
-                        data: email.data,
+                        data: data,
                         fechaModificacion: strTime,
                         fechaFinConsentimeinto: email.fechaFin
                     })
@@ -653,7 +653,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
     var idEmail = req.params.id
 
     var email = await EmailModel.findById(idEmail)
-
+    var {permisos, data} = req.body
     //console.log("este es email",email)
 
     if (email) {
@@ -685,7 +685,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                         heigh: 0,
                         heighEnterprise: 0,
                         body: null,
-                        data: email.data,
+                        data: data,
                         permisos: permisosAux,
                         userId: email.usuario.id,
                         enterpriseId: email.empresa.id,
@@ -738,7 +738,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                             name: email.usuario.name
                         },
                         permisos: permisosAux,
-                        data: email.data,
+                        data: data,
                         fechaModificacion: strTime,
                         fechaFinConsentimeinto: email.fechaFin
                     })
@@ -762,7 +762,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                         heigh: 0,
                         heighEnterprise: 0,
                         body: null,
-                        data: email.data,
+                        data: data,
                         permisos: permisosAux,
                         userId: email.usuario.id,
                         enterpriseId: email.empresa.id,
@@ -860,7 +860,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                             name: email.usuario.name
                         },
                         permisos: permisosAux,
-                        data: email.data,
+                        data: data,
                         fechaModificacion: strTime,
                         fechaFinConsentimeinto: email.fechaFin
                     })

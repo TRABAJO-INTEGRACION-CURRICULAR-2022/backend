@@ -331,11 +331,11 @@ EnterpriseCtrl.createTreatment = async (req, res) => {
 
 
 
-        let { name, data } = req.body
+        let { name, data, description } = req.body
 
         let treatment = await TreatmentModel.findOne({ name: name })
 
-
+        console.log(data)
 
         if (treatment) {
             res.status(400).send({
