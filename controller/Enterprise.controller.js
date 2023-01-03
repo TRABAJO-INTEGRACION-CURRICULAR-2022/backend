@@ -347,7 +347,8 @@ EnterpriseCtrl.createTreatment = async (req, res) => {
             const NewData = new TreatmentModel({
                 name: name,
                 data: data,
-                enterpriseId: id
+                enterpriseId: id,
+                description: description
 
             })
 
