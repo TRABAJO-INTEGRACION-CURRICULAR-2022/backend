@@ -8,6 +8,7 @@ const BlockchainModal = require('../model/Blockchain.modal');
 const ConsentModel = require('../model/Consent.model');
 const TreatmentModel = require('../model/Treatment.model');
 var XLSX = require('xlsx');
+const fs= require("fs")
 
 
 
@@ -138,6 +139,7 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
         if (usuario) {
 
             let date = new Date();
+            
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
             try {
@@ -482,12 +484,13 @@ EnterpriseCtrl.getTreatment = async (req, res) => {
 }
 
 
-//Descargar historial
+//Descargar historial de usuario
 
-EnterpriseCtrl.exportData = async (req, res) => {
+EnterpriseCtrl.exportDatabyUser = async (req, res) => {
 
     let enterpriseId = req.params.enterpriseId
     let userId = req.params.userId
+    let type = req.params.type
 
     let enterprise = await EnterpriseModel.findById(enterpriseId)
 
@@ -509,14 +512,114 @@ EnterpriseCtrl.exportData = async (req, res) => {
 
 
     let blockchain = await BlockchainModal.find({ userId: userId, enterpriseId: enterpriseId })
+    let date = Date()
+    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+    const d = new Date(strTime);
+
+
+    if(type==="xlsx"){
+    
+    
+
     var wb = XLSX.utils.book_new(); //new workbook
     var temp = JSON.stringify(blockchain);
     temp = JSON.parse(temp);
     var ws = XLSX.utils.json_to_sheet(temp);
-    var down = __dirname + '/public/exportdata.xlsx'
+    var down = __dirname + `/public/${d.getDay()}-exportdataUser.xlsx`
     XLSX.utils.book_append_sheet(wb, ws, "sheet1");
     XLSX.writeFile(wb, down);
     res.download(down);
+    //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+    }else if(type==="csv"){
+
+        var wb = XLSX.utils.book_new(); //new workbook
+        var temp = JSON.stringify(blockchain);
+        temp = JSON.parse(temp);
+        var ws = XLSX.utils.json_to_sheet(temp);
+        var down = __dirname + `/public/${d.getDay()}-exportdata.csv`
+        XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+        XLSX.writeFile(wb, down);
+    
+        res.download(down);
+       
+
+    }else{
+        res.status(400).send({
+            status: true,
+            message:"No existe la extensión del archivo solicitada"
+        })
+    }
+
+   
+    
+
+}
+
+//Descargar historial por tratamiento
+
+EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
+
+    let enterpriseId = req.params.enterpriseId
+    let treatment = req.params.treatment
+    let type = req.params.type
+    
+
+    let enterprise = await EnterpriseModel.findById(enterpriseId)
+
+    if (!enterprise) {
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+    }else{
+
+  //db.users.find({awards: {$elemMatch: {award:'National Medal', year:1975}}})
+
+
+    let blockchain = await BlockchainModal.find({enterpriseId: enterpriseId, permisos:{$elemMatch: {tipo:treatment}} })
+
+    let date = Date()
+    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+    const d = new Date(strTime);
+
+    if(type==="xlsx"){
+    
+    
+
+        var wb = XLSX.utils.book_new(); //new workbook
+        var temp = JSON.stringify(blockchain);
+        temp = JSON.parse(temp);
+        var ws = XLSX.utils.json_to_sheet(temp);
+        var down = __dirname + `/public/${d.getDay()}-exportdataTreatment.xlsx`
+        XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+        XLSX.writeFile(wb, down);
+        res.download(down);
+        //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+        }else if(type==="csv"){
+    
+            var wb = XLSX.utils.book_new(); //new workbook
+            var temp = JSON.stringify(blockchain);
+            temp = JSON.parse(temp);
+            var ws = XLSX.utils.json_to_sheet(temp);
+            var down = __dirname + `/public/${d.getDay()}-exportdata.csv`
+            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+            XLSX.writeFile(wb, down);
+        
+            res.download(down);
+           
+    
+        }else{
+            res.status(400).send({
+                status: true,
+                message:"No existe la extensión del archivo solicitada"
+            })
+        }
+    
+    }
+
+    
 
 }
 

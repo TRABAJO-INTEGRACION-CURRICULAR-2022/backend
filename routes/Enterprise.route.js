@@ -46,7 +46,10 @@ router.get("/getTreatment/:id", enterpriseCtrl.getTreatment)
 
 //descargar historial
 
-router.get("/exportData/:enterpriseId/:userId", enterpriseCtrl.exportData)
+router.get("/exportData/:enterpriseId/:userId/:type", enterpriseCtrl.exportDatabyUser)
+
+router.get("/exportDatabyTreatment/:enterpriseId/:treatment/:type", enterpriseCtrl.exportDatabyTreatment)
+
 
 
 

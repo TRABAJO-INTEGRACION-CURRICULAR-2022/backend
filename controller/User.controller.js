@@ -260,6 +260,8 @@ UserCtrl.updateUser = async (req, res) => {
                     block.previousHashEnterprise = hashEmpresaAnterior
                     block.previousHashMain = bloqueAnterior.hashMain
 
+                    
+
 
 
 
@@ -432,6 +434,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                         heigh: 0,
                         heighEnterprise: 0,
                         body: null,
+                        bodyToEncript: null,
                         data: data,
                         permisos: permisosAux,
                         userId: email.usuario.id,
@@ -440,29 +443,19 @@ UserCtrl.acceptConsent = async (req, res) => {
 
                     })
 
-                    const block = new Block({ data: blockNew });
-                    const hashEnterprise = strTime + email.idEmpresa
-                    block.hashMain = SHA256(JSON.stringify(block)).toString();
-                    block.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
-                    block.height = 0
-                    block.heighEnterprise = 0
-                    block.permisos = permisosAux
-                    block.userId = email.usuario.id
-                    block.enterpriseId = email.empresa.id
-                    block.fechaModificacion = strTime
+                    let body = JSON.stringify(blockNew)
 
+                    blockNew.body = body
+                   
 
-                    blockNew.hashMain = block.hashMain
-                    blockNew.hashEnterprise = block.hashEnterprise
-                    blockNew.previousHashMain = null
-                    blockNew.previousHashEnterprise = null
-                    blockNew.heigh = block.height
-                    blockNew.heighEnterprise = block.heighEnterprise
-                    blockNew.body = block.body
-                    blockNew.permisos = block.permisos
-                    blockNew.userId = block.userId
-                    blockNew.enterpriseId = block.enterpriseId
-                    blockNew.fechaModificacion = strTime
+                    //console.log("antes de encriptar", ((body)))
+
+                    //console.log("pruebaaa", (body.toString("hex")))
+                    
+                    const hashEnterprise = strTime + email.empresa.id
+                    blockNew.hashMain = SHA256((body)).toString();
+                    blockNew.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
+
 
                     email.respondido = true;
                     for (var i = 0; i < email.permisos; i++) {
@@ -501,22 +494,7 @@ UserCtrl.acceptConsent = async (req, res) => {
 
                 } else {
 
-                    const blockNew = new BlockchainModel({
-                        hashMain: null,
-                        hashEnterprise: null,
-                        previousHashEnterprise: null,
-                        previousHashMain: null,
-                        heigh: 0,
-                        heighEnterprise: 0,
-                        body: null,
-                        data: data,
-                        permisos: permisosAux,
-                        userId: email.usuario.id,
-                        enterpriseId: email.empresa.id,
-                        fechaModificacion: strTime
-
-                    })
-
+                
 
                     const idEmpresa = email.empresa.id
                     //const idUsuario = email.idUsuario
@@ -543,7 +521,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                         //console.log("este es el email", email)
 
                         let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.empresa.id })
-                        console.log("se supone que el otro bloque", bloquesCadena)
+                        //console.log("se supone que el otro bloque", bloquesCadena)
                         if (bloquesCadena.length > 0) {
                             console.log("entre al if")
                             let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
@@ -557,35 +535,36 @@ UserCtrl.acceptConsent = async (req, res) => {
                         heighEnterprise = 0
                     }
 
+                    const blockNew = new BlockchainModel({
+                        hashMain: null,
+                        hashEnterprise: null,
+                        previousHashEnterprise:  hashEmpresaAnterior,
+                        previousHashMain: bloqueAnterior.hashMain,
+                        heigh: cadena.length,
+                        heighEnterprise: heighEnterprise,
+                        body: null,
+                        data: data,
+                        permisos: permisosAux,
+                        userId: email.usuario.id,
+                        enterpriseId: email.empresa.id,
+                        fechaModificacion: strTime
 
-                    const block = new Block({ data: blockNew });
-                    const hashEnterprise = strTime + email.idEmpresa
-                    block.hashMain = SHA256(JSON.stringify(block)).toString();
-                    block.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
-                    block.height = cadena.length
-                    block.heighEnterprise = heighEnterprise
-                    block.permisos = permisosAux
-                    block.userId = email.usuario.id
-                    block.enterpriseId = email.empresa.id
-                    block.fechaModificacion = strTime
-                    block.previousHashEnterprise = hashEmpresaAnterior
-                    console.log("hash empresa  anterior", hashEmpresaAnterior)
-                    block.previousHashMain = bloqueAnterior.hashMain
+                    })
 
-                    // console.log("bloques",block.previousHashEnterprise, block.previousHashMain)
+                    let body = JSON.stringify(blockNew)
+
+                    blockNew.body = body
+                
+                    const hashEnterprise = strTime + email.empresa.id
+
+                    blockNew.hashMain = SHA256((body)).toString();
+                    blockNew.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
 
 
-                    blockNew.hashMain = block.hashMain
-                    blockNew.hashEnterprise = block.hashEnterprise
-                    blockNew.previousHashMain = block.previousHashMain
-                    blockNew.previousHashEnterprise = block.previousHashEnterprise
-                    blockNew.heigh = block.height
-                    blockNew.heighEnterprise = block.heighEnterprise
-                    blockNew.body = block.body
-                    blockNew.permisos = block.permisos
-                    blockNew.userId = block.userId
-                    blockNew.enterpriseId = block.enterpriseId
-                    blockNew.fechaModificacion = strTime
+                 
+    
+
+            
 
                     email.respondido = true;
 
@@ -694,7 +673,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                     })
 
                     const block = new Block({ data: blockNew });
-                    const hashEnterprise = strTime + email.idEmpresa
+                    const hashEnterprise = strTime + email.empresa.id
                     block.hashMain = SHA256(JSON.stringify(block)).toString();
                     block.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
                     block.height = 0
@@ -796,7 +775,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                         //console.log("este es el email", email)
 
                         let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.empresa.id })
-                        console.log("se supone que el otro bloque", bloquesCadena)
+                       // console.log("se supone que el otro bloque", bloquesCadena)
                         if (bloquesCadena.length > 0) {
                             console.log("entre al if")
                             let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
@@ -812,7 +791,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
 
 
                     const block = new Block({ data: blockNew });
-                    const hashEnterprise = strTime + email.idEmpresa
+                    const hashEnterprise = strTime + email.empresa.id
                     block.hashMain = SHA256(JSON.stringify(block)).toString();
                     block.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
                     block.height = cadena.length

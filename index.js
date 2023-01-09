@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const archivoDB = require("./database");
 const config = require("./utils/config");
+require("./cron/cron")
 
 const app = express();
 
