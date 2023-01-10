@@ -50,8 +50,17 @@ router.get("/exportData/:enterpriseId/:userId/:type", enterpriseCtrl.exportDatab
 
 router.get("/exportDatabyTreatment/:enterpriseId/:treatment/:type", enterpriseCtrl.exportDatabyTreatment)
 
+//Filtrar usuarios por tratamiento
+router.get("/getUsersByTreatment/:enterpriseId/:treatment", enterpriseCtrl.getUsersByTreatment)
+
+//Exportar todo empresa
+
+router.get("/exportAllEnterprise/:enterpriseId/:type", enterpriseCtrl.exportAllEnterprise)
+
+//Obtener blockchain
 
 
+router.get("/getBlockChain/:enterpriseId/:userId", enterpriseCtrl.getBlockChain)
 
 
 

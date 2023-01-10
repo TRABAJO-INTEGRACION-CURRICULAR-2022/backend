@@ -434,7 +434,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                         heigh: 0,
                         heighEnterprise: 0,
                         body: null,
-                        bodyToEncript: null,
+                        body_enterprise:null,
                         data: data,
                         permisos: permisosAux,
                         userId: email.usuario.id,
@@ -452,9 +452,11 @@ UserCtrl.acceptConsent = async (req, res) => {
 
                     //console.log("pruebaaa", (body.toString("hex")))
                     
-                    const hashEnterprise = strTime + email.empresa.id
+                    const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
+
+                    blockNew.body_enterprise = (hashEnterprise)
                     blockNew.hashMain = SHA256((body)).toString();
-                    blockNew.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
+                    blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
 
 
                     email.respondido = true;
@@ -543,6 +545,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                         heigh: cadena.length,
                         heighEnterprise: heighEnterprise,
                         body: null,
+                        body_enterprise:null,
                         data: data,
                         permisos: permisosAux,
                         userId: email.usuario.id,
@@ -555,10 +558,10 @@ UserCtrl.acceptConsent = async (req, res) => {
 
                     blockNew.body = body
                 
-                    const hashEnterprise = strTime + email.empresa.id
-
+                    const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
+                    blockNew.body_enterprise = hashEnterprise
                     blockNew.hashMain = SHA256((body)).toString();
-                    blockNew.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
+                    blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
 
 
                  

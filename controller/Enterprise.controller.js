@@ -8,7 +8,7 @@ const BlockchainModal = require('../model/Blockchain.modal');
 const ConsentModel = require('../model/Consent.model');
 const TreatmentModel = require('../model/Treatment.model');
 var XLSX = require('xlsx');
-const fs= require("fs")
+const fs = require("fs")
 
 
 
@@ -139,7 +139,7 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
         if (usuario) {
 
             let date = new Date();
-            
+
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
             try {
@@ -518,20 +518,20 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
     const d = new Date(strTime);
 
 
-    if(type==="xlsx"){
-    
-    
+    if (type === "xlsx") {
 
-    var wb = XLSX.utils.book_new(); //new workbook
-    var temp = JSON.stringify(blockchain);
-    temp = JSON.parse(temp);
-    var ws = XLSX.utils.json_to_sheet(temp);
-    var down = __dirname + `/public/${d.getDay()}-exportdataUser.xlsx`
-    XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-    XLSX.writeFile(wb, down);
-    res.download(down);
-    //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
-    }else if(type==="csv"){
+
+
+        var wb = XLSX.utils.book_new(); //new workbook
+        var temp = JSON.stringify(blockchain);
+        temp = JSON.parse(temp);
+        var ws = XLSX.utils.json_to_sheet(temp);
+        var down = __dirname + `/public/${d.getDay()}-exportdataUser.xlsx`
+        XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+        XLSX.writeFile(wb, down);
+        res.download(down);
+        //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+    } else if (type === "csv") {
 
         var wb = XLSX.utils.book_new(); //new workbook
         var temp = JSON.stringify(blockchain);
@@ -540,19 +540,19 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
         var down = __dirname + `/public/${d.getDay()}-exportdata.csv`
         XLSX.utils.book_append_sheet(wb, ws, "sheet1");
         XLSX.writeFile(wb, down);
-    
-        res.download(down);
-       
 
-    }else{
+        res.download(down);
+
+
+    } else {
         res.status(400).send({
             status: true,
-            message:"No existe la extensión del archivo solicitada"
+            message: "No existe la extensión del archivo solicitada"
         })
     }
 
-   
-    
+
+
 
 }
 
@@ -563,7 +563,7 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
     let enterpriseId = req.params.enterpriseId
     let treatment = req.params.treatment
     let type = req.params.type
-    
+
 
     let enterprise = await EnterpriseModel.findById(enterpriseId)
 
@@ -572,33 +572,33 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
             status: false,
             message: "No existe la empresa"
         })
-    }else{
+    } else {
 
-  //db.users.find({awards: {$elemMatch: {award:'National Medal', year:1975}}})
+        //db.users.find({awards: {$elemMatch: {award:'National Medal', year:1975}}})
 
 
-    let blockchain = await BlockchainModal.find({enterpriseId: enterpriseId, permisos:{$elemMatch: {tipo:treatment}} })
+        let blockchain = await BlockchainModal.find({ enterpriseId: enterpriseId, permisos: { $elemMatch: { tipo: treatment } } })
 
-    let date = Date()
-    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+        let date = Date()
+        let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
-    const d = new Date(strTime);
+        const d = new Date(strTime);
 
-    if(type==="xlsx"){
-    
-    
+        if (type === "xlsx") {
 
-        var wb = XLSX.utils.book_new(); //new workbook
-        var temp = JSON.stringify(blockchain);
-        temp = JSON.parse(temp);
-        var ws = XLSX.utils.json_to_sheet(temp);
-        var down = __dirname + `/public/${d.getDay()}-exportdataTreatment.xlsx`
-        XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-        XLSX.writeFile(wb, down);
-        res.download(down);
-        //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
-        }else if(type==="csv"){
-    
+
+
+            var wb = XLSX.utils.book_new(); //new workbook
+            var temp = JSON.stringify(blockchain);
+            temp = JSON.parse(temp);
+            var ws = XLSX.utils.json_to_sheet(temp);
+            var down = __dirname + `/public/${d.getDay()}-exportdataTreatment.xlsx`
+            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+            XLSX.writeFile(wb, down);
+            res.download(down);
+            //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+        } else if (type === "csv") {
+
             var wb = XLSX.utils.book_new(); //new workbook
             var temp = JSON.stringify(blockchain);
             temp = JSON.parse(temp);
@@ -606,22 +606,232 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
             var down = __dirname + `/public/${d.getDay()}-exportdata.csv`
             XLSX.utils.book_append_sheet(wb, ws, "sheet1");
             XLSX.writeFile(wb, down);
-        
+
             res.download(down);
-           
-    
-        }else{
+
+
+        } else {
             res.status(400).send({
                 status: true,
-                message:"No existe la extensión del archivo solicitada"
+                message: "No existe la extensión del archivo solicitada"
             })
         }
-    
+
     }
 
-    
+
 
 }
+
+
+//Filtro  por tratamiento
+
+EnterpriseCtrl.getUsersByTreatment = async (req, res) => {
+
+    let enterpriseId = req.params.enterpriseId
+    let treatment = req.params.treatment
+
+
+    let enterprise = await EnterpriseModel.findById(enterpriseId)
+
+    if (!enterprise) {
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+    } else {
+        let consents = await ConsentModel.find({ "empresa.id": enterpriseId, permisos: { $elemMatch: { tipo: treatment } } })
+
+
+        if (consents.length > 0) {
+            usersSend = []
+
+            for (var i = 0; i < consents.length; i++) {
+
+
+                let user = await UserModal.findById(consents[i].usuario.id)
+                usersSend[i] = {
+                    id_consent: consents[i]._id,
+                    id_user: user._id,
+                    fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto,
+                    name: user.name,
+                    lastname: user.lastName,
+                    permisos: consents[i].permisos
+                }
+            }
+
+            res.status(200).send({
+                status: true,
+                consents: usersSend
+            })
+        } else {
+            res.status(400).send({
+                status: false,
+                message: "No existen usuarios"
+            })
+        }
+
+    }
+
+
+}
+
+//Exportar toda data empresa
+
+EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
+
+    let enterpriseId = req.params.enterpriseId
+    let type = req.params.type
+
+
+    let enterprise = await EnterpriseModel.findById(enterpriseId)
+
+    if (!enterprise) {
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+    } else {
+
+        let date = Date()
+        let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+        const d = new Date(strTime);
+        let blockchain = await BlockchainModal.find({ enterpriseId: enterpriseId })
+
+
+        if(blockchain.length > 0){
+
+
+        if (type === "xlsx") {
+
+
+
+            var wb = XLSX.utils.book_new(); //new workbook
+            var temp = JSON.stringify(blockchain);
+            temp = JSON.parse(temp);
+            var ws = XLSX.utils.json_to_sheet(temp);
+            var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprise.xlsx`
+            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+            XLSX.writeFile(wb, down);
+            res.download(down);
+            //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+        } else if (type === "csv") {
+
+            var wb = XLSX.utils.book_new(); //new workbook
+            var temp = JSON.stringify(blockchain);
+            temp = JSON.parse(temp);
+            var ws = XLSX.utils.json_to_sheet(temp);
+            var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprise.csv`
+            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+            XLSX.writeFile(wb, down);
+
+            res.download(down);
+
+
+        } else {
+            res.status(400).send({
+                status: true,
+                message: "No existe la extensión del archivo solicitada"
+            })
+        }
+    }else{
+        res.status(400).send({
+            status: true,
+            message: "No existen usuarios"
+        })
+    }
+
+    }
+
+}
+
+//Obtener blockchain
+
+
+EnterpriseCtrl.getBlockChain = async(req,res)=>{
+    let enterpriseId = req.params.enterpriseId
+    let userId = req.params.userId
+
+    let enterprise = await EnterpriseModel.findById(enterpriseId)
+
+    let user = await UserModal.findById(userId)
+
+    if(!enterprise){
+
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+
+    }else{
+
+        if(!user){  
+            
+            res.status(400).send({
+                status: false,
+                message: "No existe el usuario"
+            })
+
+
+        }else{
+
+            let blockchain = await BlockchainModal.find({enterpriseId: enterpriseId, userId: userId})
+
+            let body = []
+
+
+            if(blockchain.length > 0){
+
+                
+                /*let body = [];
+                for(var i = 0; i < blockchain.length; i++){
+                    body[i] =  JSON.parse(blockchain[i].body)
+                    //console.log("body", body)
+                    //blockchain[i].body = body
+                   // blockchain.body_enterprise = body_enterprise
+
+                }*/
+
+               /* let prueba = [
+                    {
+                      _id: new ObjectId("63b647c5b3107e66230a14ca"),
+                      hashMain: 'b3f0e069b36e8632e8b40245d1811499f00945810cf3febe9b2e8b0d61e3bb62',
+                      hashEnterprise: '302113f89c075cbc4844c36c5700b9c68fb480593d48952aabcbe3259e072514',
+                      previousHashMain: null,
+                      previousHashEnterprise: null,
+                      heigh: 0,
+                      heighEnterprise: 0,
+                      body: '{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}',
+                      data: [ [Object], [Object], [Object] ],
+                      permisos: [ [Object], [Object] ],
+                      userId: new ObjectId("63b362dcb6d5635be00ea1a1"),
+                      enterpriseId: new ObjectId("63b362d8b6d5635be00ea19e"),
+                      fechaModificacion: '1/4/2023, 10:45:09 PM',
+                      __v: 0
+                    }
+                  ]*/
+
+                  //const s =  `{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}`
+                
+                console.log("holi",blockchain)
+
+                res.status(200).send({
+                    status: true,
+                    blockchain: blockchain
+                })
+            }else{
+                res.status(400).send({
+                    status: false,
+                    message: "No existe cadena"
+                })
+    
+            }
+        }
+    }
+}
+
+
 
 
 

@@ -9,6 +9,7 @@ const BlockchainSchema = new Schema({
     heigh: { type: Number, require: [true, 'heigh'] },
     heighEnterprise: { type: Number, require: [true, 'heigh'] },
     body: { type: String, require: [true, 'body'] },
+    body_enterprise:{type: String, require: true},
     data:[{tipo: {type: String},valor:{type:String}}],
     permisos: [{
         tipo: {type: String}, 
