@@ -1,4 +1,5 @@
 const express = require('express');
+const UserCtrl = require('../controller/User.controller');
 const router = express.Router()
 const userCtrl = require ('../controller/User.controller');
 const authToken = require("../middleware/authenticateToken")
@@ -47,7 +48,10 @@ router.get('/getTreatmentsEnterprises/:id', userCtrl.getEnterprisestreatments)
 
 router.get('/getTreatmentEnterprise/:id', userCtrl.getEnterprisetreatment)
 
+//Exportar data por usuario y por empresa
 
+
+router.get("/exportAllEnterpriseAndUser/:enterpriseId/:userId/:type",UserCtrl.exportAllEnterpriseAndUser)
 
 
 
