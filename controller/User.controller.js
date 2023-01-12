@@ -448,17 +448,12 @@ UserCtrl.acceptConsent = async (req, res) => {
                     let body = JSON.stringify(blockNew)
 
                     blockNew.body = body
-                   
-
-                    //console.log("antes de encriptar", ((body)))
-
-                    //console.log("pruebaaa", (body.toString("hex")))
-                    
+                
                     const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
-
-                    blockNew.body_enterprise = (hashEnterprise)
+                    blockNew.body_enterprise = hashEnterprise
                     blockNew.hashMain = SHA256((body)).toString();
                     blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
+
 
 
                     email.respondido = true;
