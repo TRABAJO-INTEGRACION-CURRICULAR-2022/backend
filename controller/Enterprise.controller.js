@@ -849,9 +849,11 @@ EnterpriseCtrl.getEmailsDoesntAnswered = async(req,res)=>{
 
     let enterprise = await EnterpriseModel.findById(id)
 
-    if(!enterprise){
+    if(enterprise){
     
         let emails = await EmailModel.find({"empresa.id":id, respondido:false})
+
+
 
         if(emails.length > 0){
 
