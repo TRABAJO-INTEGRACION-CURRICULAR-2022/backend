@@ -62,6 +62,10 @@ router.get("/exportAllEnterprise/:enterpriseId/:type", enterpriseCtrl.exportAllE
 
 router.get("/getBlockChain/:enterpriseId/:userId", enterpriseCtrl.getBlockChain)
 
+//Obtener correos no respondidos
+
+router.get("/getEmailsDoesntAnswered/:id", enterpriseCtrl.getEmailsDoesntAnswered)
+
 
 
 module.exports = router

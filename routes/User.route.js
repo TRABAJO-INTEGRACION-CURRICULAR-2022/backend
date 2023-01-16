@@ -53,6 +53,25 @@ router.get('/getTreatmentEnterprise/:id', userCtrl.getEnterprisetreatment)
 
 router.get("/exportAllEnterpriseAndUser/:enterpriseId/:userId/:type",UserCtrl.exportAllEnterpriseAndUser)
 
+//borrar consentimeinto
+
+
+router.delete("/deleteConsent/:id",UserCtrl.deleteConsent)
+
+
+//Editar Tratameinto
+
+router.put("/updateTreatmente/:id",UserCtrl.updateTreatmente)
+
+
+//Actualizar data
+
+
+router.put("/updateData/:id", UserCtrl.updateData)
+
+
+
+
 
 
 module.exports = router

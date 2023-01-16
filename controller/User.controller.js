@@ -11,6 +11,7 @@ const SHA256 = require("crypto-js/sha256");
 const { findById } = require('../model/Email.model');
 const BlockchainModal = require('../model/Blockchain.modal');
 var XLSX = require('xlsx');
+const { RIPEMD160 } = require('crypto-js');
 
 
 
@@ -227,14 +228,14 @@ UserCtrl.updateUser = async (req, res) => {
                     let bloqueAnteriorEmpresa;
 
                     if (bloqueAnteriorEmpresaArray.length > 0) {
-                       
+
 
                         bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
 
                         hashMainAnterior = bloqueAnteriorEmpresa.hashMain
                         heighEnterprise = bloqueAnteriorEmpresaArray.length
 
-                        let bloquesCadena = await BlockchainModel.find({ enterpriseId: idEmpresa})
+                        let bloquesCadena = await BlockchainModel.find({ enterpriseId: idEmpresa })
                         if (bloquesCadena.length > 0) {
                             let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
                             hashEmpresaAnterior = bloqueFinal.hashEnterprise
@@ -262,7 +263,7 @@ UserCtrl.updateUser = async (req, res) => {
                     block.previousHashEnterprise = hashEmpresaAnterior
                     block.previousHashMain = bloqueAnterior.hashMain
 
-                    
+
 
 
 
@@ -341,7 +342,7 @@ UserCtrl.getEmails = async (req, res) => {
 
             let enviarEmails = []
 
-            for(var i = 0 ; i < emails.length; i++){
+            for (var i = 0; i < emails.length; i++) {
 
                 enviarEmails[i] = {
                     id: emails[i]._id,
@@ -367,15 +368,15 @@ UserCtrl.getEmails = async (req, res) => {
     }
 }
 
-UserCtrl.getEmail = async(req,res)=>{
+UserCtrl.getEmail = async (req, res) => {
     var id = req.params.id
 
     let email = await EmailModel.findById(id)
 
 
-    if(email){
+    if (email) {
         res.send(email)
-    }else{
+    } else {
         res.status(404).send({
             status: false,
             message: "No existe el email"
@@ -392,236 +393,236 @@ UserCtrl.acceptConsent = async (req, res) => {
 
     var email = await EmailModel.findById(idEmail)
 
-    var {permisos, data} = req.body
+    var { permisos, data } = req.body
 
-    if(!permisos){
+    if (!permisos) {
 
         res.json({
-            status:"Permisos esta vació"
+            status: "Permisos esta vació"
         })
-    }else{
+    } else {
 
-    if (email) {
+        if (email) {
 
-        if (!email.respondido) {
+            if (!email.respondido) {
 
-            const cadena = await BlockchainModel.find();
+                const cadena = await BlockchainModel.find();
 
-            let date = new Date();
-            let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+                let date = new Date();
+                let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
-            let permisosAux = permisos
+                let permisosAux = permisos
 
-            let permisosTrue = []
+                let permisosTrue = []
 
-            for(var i = 0; i < permisos.length; i++){
-                if(permisos[i].valor === true){
-                    permisosTrue[i] = permisos[i]
-                }
-            }
-
-            
-
-            let usuario = await UserModel.findById(email.usuario.id)
-
-            if (usuario) {
-
-                if (cadena.length === 0) {
-
-                    const blockNew = new BlockchainModel({
-                        hashMain: null,
-                        hashEnterprise: null,
-                        previousHashEnterprise: null,
-                        previousHashMain: null,
-                        heigh: 0,
-                        heighEnterprise: 0,
-                        body: null,
-                        body_enterprise:null,
-                        data: data,
-                        permisos: permisosAux,
-                        userId: email.usuario.id,
-                        enterpriseId: email.empresa.id,
-                        fechaModificacion: strTime
-
-                    })
-
-                    let body = JSON.stringify(blockNew)
-
-                    blockNew.body = body
-                
-                    const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
-                    blockNew.body_enterprise = hashEnterprise
-                    blockNew.hashMain = SHA256((body)).toString();
-                    blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
-
-
-
-                    email.respondido = true;
-                    for (var i = 0; i < email.permisos; i++) {
-                        email.permisos.valor = false
+                for (var i = 0; i < permisos.length; i++) {
+                    if (permisos[i].valor === true) {
+                        permisosTrue[i] = permisos[i]
                     }
-
-                    await email.save()
-
-
-                    await blockNew.save()
-
-
-                    let newConsent = new ConsentModel({
-                        empresa: {
-                            id: email.empresa.id,
-                            name: email.empresa.name
-                        },
-                        usuario: {
-                            id: email.usuario.id,
-                            name: email.usuario.name
-                        },
-                        permisos: permisosTrue,
-                        data: data,
-                        fechaModificacion: strTime,
-                        fechaFinConsentimeinto: email.fechaFin
-                    })
-
-                    await newConsent.save()
+                }
 
 
 
-                    res.json({
-                        status: "ok"
-                    })
+                let usuario = await UserModel.findById(email.usuario.id)
+
+                if (usuario) {
+
+                    if (cadena.length === 0) {
+
+                        const blockNew = new BlockchainModel({
+                            hashMain: null,
+                            hashEnterprise: null,
+                            previousHashEnterprise: null,
+                            previousHashMain: null,
+                            heigh: 0,
+                            heighEnterprise: 0,
+                            body: null,
+                            body_enterprise: null,
+                            data: data,
+                            permisos: permisosAux,
+                            userId: email.usuario.id,
+                            enterpriseId: email.empresa.id,
+                            fechaModificacion: strTime
+
+                        })
+
+                        let body = JSON.stringify(blockNew)
+
+                        blockNew.body = body
+
+                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
+                        blockNew.body_enterprise = hashEnterprise
+                        blockNew.hashMain = SHA256((body)).toString();
+                        blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
 
 
-                } else {
 
-                
-
-                    const idEmpresa = email.empresa.id
-                    //const idUsuario = email.idUsuario
-
-
-
-                    const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
-                    const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
-                    //console.log("esta es el array", bloqueAnteriorEmpresaArray)
-                    let hashEmpresaAnterior;
-                    let hashMainAnterior;
-                    let heighEnterprise = 0
-                    let bloqueAnteriorEmpresa;
-
-                    if (bloqueAnteriorEmpresaArray.length > 0) {
-                        // console.log("entre", bloqueAnteriorEmpresaArray.length)
-                        bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
-                        //console.log("bloque indivudal", bloqueAnteriorEmpresa)
-                        // hashEmpresaAnterior = null
-                        hashMainAnterior = bloqueAnteriorEmpresa.hashMain
-                        heighEnterprise = bloqueAnteriorEmpresaArray.length
-                        //console.log("hash empresa, hash main", hashMain, hashEnterprise)
-                        //console.log("bloque anterior",bloqueAnteriorEmpresa)
-                        //console.log("este es el email", email)
-
-                        let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.empresa.id })
-                        //console.log("se supone que el otro bloque", bloquesCadena)
-                        if (bloquesCadena.length > 0) {
-                            console.log("entre al if")
-                            let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
-                            hashEmpresaAnterior = bloqueFinal.hashEnterprise
+                        email.respondido = true;
+                        for (var i = 0; i < email.permisos; i++) {
+                            email.permisos.valor = false
                         }
 
+                        await email.save()
+
+
+                        await blockNew.save()
+
+
+                        let newConsent = new ConsentModel({
+                            empresa: {
+                                id: email.empresa.id,
+                                name: email.empresa.name
+                            },
+                            usuario: {
+                                id: email.usuario.id,
+                                name: email.usuario.name
+                            },
+                            permisos: permisosTrue,
+                            data: data,
+                            fechaModificacion: strTime,
+                            fechaFinConsentimeinto: email.fechaFin
+                        })
+
+                        await newConsent.save()
+
+
+
+                        res.json({
+                            status: "ok"
+                        })
+
+
                     } else {
-                        bloqueAnteriorEmpresa = null;
-                        hashEmpresaAnterior = null
-                        hashMainAnterior = null
-                        heighEnterprise = 0
+
+
+
+                        const idEmpresa = email.empresa.id
+                        //const idUsuario = email.idUsuario
+
+
+
+                        const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
+                        const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
+                        //console.log("esta es el array", bloqueAnteriorEmpresaArray)
+                        let hashEmpresaAnterior;
+                        let hashMainAnterior;
+                        let heighEnterprise = 0
+                        let bloqueAnteriorEmpresa;
+
+                        if (bloqueAnteriorEmpresaArray.length > 0) {
+                            // console.log("entre", bloqueAnteriorEmpresaArray.length)
+                            bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
+                            //console.log("bloque indivudal", bloqueAnteriorEmpresa)
+                            // hashEmpresaAnterior = null
+                            hashMainAnterior = bloqueAnteriorEmpresa.hashMain
+                            heighEnterprise = bloqueAnteriorEmpresaArray.length
+                            //console.log("hash empresa, hash main", hashMain, hashEnterprise)
+                            //console.log("bloque anterior",bloqueAnteriorEmpresa)
+                            //console.log("este es el email", email)
+
+                            let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.empresa.id })
+                            //console.log("se supone que el otro bloque", bloquesCadena)
+                            if (bloquesCadena.length > 0) {
+                                console.log("entre al if")
+                                let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
+                                hashEmpresaAnterior = bloqueFinal.hashEnterprise
+                            }
+
+                        } else {
+                            bloqueAnteriorEmpresa = null;
+                            hashEmpresaAnterior = null
+                            hashMainAnterior = null
+                            heighEnterprise = 0
+                        }
+
+                        const blockNew = new BlockchainModel({
+                            hashMain: null,
+                            hashEnterprise: null,
+                            previousHashEnterprise: hashEmpresaAnterior,
+                            previousHashMain: bloqueAnterior.hashMain,
+                            heigh: cadena.length,
+                            heighEnterprise: heighEnterprise,
+                            body: null,
+                            body_enterprise: null,
+                            data: data,
+                            permisos: permisosAux,
+                            userId: email.usuario.id,
+                            enterpriseId: email.empresa.id,
+                            fechaModificacion: strTime
+
+                        })
+
+                        let body = JSON.stringify(blockNew)
+
+                        blockNew.body = body
+
+                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
+                        blockNew.body_enterprise = hashEnterprise
+                        blockNew.hashMain = SHA256((body)).toString();
+                        blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
+
+
+
+
+
+
+
+                        email.respondido = true;
+
+                        for (var i = 0; i < email.permisos; i++) {
+                            email.permisos.valor = false
+                        }
+
+                        await email.save()
+                        await blockNew.save()
+
+
+                        let newConsent = new ConsentModel({
+                            empresa: {
+                                id: email.empresa.id,
+                                name: email.empresa.name
+                            },
+                            usuario: {
+                                id: email.usuario.id,
+                                name: email.usuario.name
+                            },
+                            permisos: permisosTrue,
+                            data: data,
+                            fechaModificacion: strTime,
+                            fechaFinConsentimeinto: email.fechaFin
+                        })
+
+                        await newConsent.save()
+
+
+
+
+
+                        res.send({
+                            status: "Consentimiento guardado"
+                        })
+
                     }
-
-                    const blockNew = new BlockchainModel({
-                        hashMain: null,
-                        hashEnterprise: null,
-                        previousHashEnterprise:  hashEmpresaAnterior,
-                        previousHashMain: bloqueAnterior.hashMain,
-                        heigh: cadena.length,
-                        heighEnterprise: heighEnterprise,
-                        body: null,
-                        body_enterprise:null,
-                        data: data,
-                        permisos: permisosAux,
-                        userId: email.usuario.id,
-                        enterpriseId: email.empresa.id,
-                        fechaModificacion: strTime
-
+                } else {
+                    res.json({
+                        status: "No existe el usuario"
                     })
-
-                    let body = JSON.stringify(blockNew)
-
-                    blockNew.body = body
-                
-                    const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
-                    blockNew.body_enterprise = hashEnterprise
-                    blockNew.hashMain = SHA256((body)).toString();
-                    blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
-
-
-                 
-    
-
-            
-
-                    email.respondido = true;
-
-                    for (var i = 0; i < email.permisos; i++) {
-                        email.permisos.valor = false
-                    }
-
-                    await email.save()
-                    await blockNew.save()
-
-
-                    let newConsent = new ConsentModel({
-                        empresa: {
-                            id: email.empresa.id,
-                            name: email.empresa.name
-                        },
-                        usuario: {
-                            id: email.usuario.id,
-                            name: email.usuario.name
-                        },
-                        permisos: permisosTrue,
-                        data: data,
-                        fechaModificacion: strTime,
-                        fechaFinConsentimeinto: email.fechaFin
-                    })
-
-                    await newConsent.save()
-
-
-
-
-
-                    res.send({
-                        status: "Consentimiento guardado"
-                    })
-
                 }
             } else {
                 res.json({
-                    status: "No existe el usuario"
+                    status: "El email ya esta respondido"
                 })
             }
+
+
+
+
+
         } else {
             res.json({
-                status: "El email ya esta respondido"
+                status: "No existe el email"
             })
         }
-
-
-
-
-
-    } else {
-        res.json({
-            status: "No existe el email"
-        })
-    }
     }
 
 }
@@ -632,7 +633,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
     var idEmail = req.params.id
 
     var email = await EmailModel.findById(idEmail)
-    var {permisos, data} = req.body
+    var { permisos, data } = req.body
     //console.log("este es email",email)
 
     if (email) {
@@ -775,7 +776,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
                         //console.log("este es el email", email)
 
                         let bloquesCadena = await BlockchainModel.find({ enterpriseId: email.empresa.id })
-                       // console.log("se supone que el otro bloque", bloquesCadena)
+                        // console.log("se supone que el otro bloque", bloquesCadena)
                         if (bloquesCadena.length > 0) {
                             console.log("entre al if")
                             let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
@@ -907,20 +908,20 @@ UserCtrl.rejectAllConsent = async (req, res) => {
 
 
 //obtener nombre, fechaFin y email del consetimeinto por id del usuario
-UserCtrl.getEnterprisestreatments = async(req,res)=>{
+UserCtrl.getEnterprisestreatments = async (req, res) => {
 
     let id = req.params.id
 
     let user = await UserModel.findById(id)
 
-    if(user){
-        let consents = await ConsentModel.find({"usuario.id":id})
+    if (user) {
+        let consents = await ConsentModel.find({ "usuario.id": id })
 
         let sendConsent = []
 
-        for(var i = 0; i < consents.length; i++){
+        for (var i = 0; i < consents.length; i++) {
             sendConsent[i] = {
-                _id:consents[i]._id,
+                _id: consents[i]._id,
                 fechaFin: consents[i].fechaFinConsentimeinto,
                 name: consents[i].empresa.name
             }
@@ -928,33 +929,33 @@ UserCtrl.getEnterprisestreatments = async(req,res)=>{
 
         res.send(sendConsent)
 
-    }else{
+    } else {
         res.json({
-            status:"No existe el usuario"
+            status: "No existe el usuario"
         })
     }
 }
 
 
 //Obtener todoDel tratamientop
-UserCtrl.getEnterprisetreatment = async(req,res)=>{
+UserCtrl.getEnterprisetreatment = async (req, res) => {
 
     let idConsent = req.params.id
 
     let consent = await ConsentModel.findById(idConsent)
 
-    if(consent){
-        
+    if (consent) {
+
         res.send(consent)
 
-    }else{
+    } else {
         res.json({
-            status:"No existe el consentimiento"
+            status: "No existe el consentimiento"
         })
     }
 }
 
-
+//Exportar data
 UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
     let enterpriseId = req.params.enterpriseId
@@ -975,70 +976,368 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
         let user = await UserModel.findById(userId)
 
 
-        if(!user){
+        if (!user) {
 
 
             res.status(400).send({
                 status: false,
                 message: "No existe el usuario"
             })
-            
-        }else{
+
+        } else {
 
             let date = Date()
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
-    
+
             const d = new Date(strTime);
-            let blockchain = await BlockchainModal.find({ userId: userId,enterpriseId: enterpriseId })
-    
-    
-            if(blockchain.length > 0){
-    
-    
-            if (type === "xlsx") {
-    
-    
-    
-                var wb = XLSX.utils.book_new(); //new workbook
-                var temp = JSON.stringify(blockchain);
-                temp = JSON.parse(temp);
-                var ws = XLSX.utils.json_to_sheet(temp);
-                var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprisebyUser.xlsx`
-                XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-                XLSX.writeFile(wb, down);
-                res.download(down);
-                //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
-            } else if (type === "csv") {
-    
-                var wb = XLSX.utils.book_new(); //new workbook
-                var temp = JSON.stringify(blockchain);
-                temp = JSON.parse(temp);
-                var ws = XLSX.utils.json_to_sheet(temp);
-                var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprisebyUser.csv`
-                XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-                XLSX.writeFile(wb, down);
-    
-                res.download(down);
-    
-    
+            let blockchain = await BlockchainModal.find({ userId: userId, enterpriseId: enterpriseId })
+
+
+            if (blockchain.length > 0) {
+
+
+                if (type === "xlsx") {
+
+
+
+                    var wb = XLSX.utils.book_new(); //new workbook
+                    var temp = JSON.stringify(blockchain);
+                    temp = JSON.parse(temp);
+                    var ws = XLSX.utils.json_to_sheet(temp);
+                    var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprisebyUser.xlsx`
+                    XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+                    XLSX.writeFile(wb, down);
+                    res.download(down);
+                    //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+                } else if (type === "csv") {
+
+                    var wb = XLSX.utils.book_new(); //new workbook
+                    var temp = JSON.stringify(blockchain);
+                    temp = JSON.parse(temp);
+                    var ws = XLSX.utils.json_to_sheet(temp);
+                    var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprisebyUser.csv`
+                    XLSX.utils.book_append_sheet(wb, ws, "sheet1");
+                    XLSX.writeFile(wb, down);
+
+                    res.download(down);
+
+
+                } else {
+                    res.status(400).send({
+                        status: true,
+                        message: "No existe la extensión del archivo solicitada"
+                    })
+                }
             } else {
                 res.status(400).send({
                     status: true,
-                    message: "No existe la extensión del archivo solicitada"
+                    message: "No existen usuarios"
                 })
             }
-        }else{
-            res.status(400).send({
-                status: true,
-                message: "No existen usuarios"
-            })
-        }
         }
 
 
-       
+
 
     }
+
+}
+
+
+//Actualziar tratamiento
+
+UserCtrl.updateTreatmente = async (req, res) => {
+
+    let date = new Date();
+    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+    console.log("entre")
+    let id = req.params.id
+
+    let consent = await ConsentModel.findById(id)
+
+    if (!consent) {
+
+        res.status(400).send({
+            status: true,
+            message: "No existe el consentimiento"
+        })
+
+    } else {
+
+
+        let { treatmentsToEliminate } = req.body
+
+        if (treatmentsToEliminate) {
+
+            let consents = []
+
+            for (var i = 0; i < treatmentsToEliminate.length; i++) {
+
+                consents[i] = await ConsentModel.find({ _id: id, permisos: { $elemMatch: { _id: treatmentsToEliminate[i] } } })
+
+                await ConsentModel.updateOne(
+                    { _id: id },
+                    { $pull: { "permisos": { "_id": treatmentsToEliminate[i] } } }
+                );
+
+
+            }
+
+            const cadena = await BlockchainModel.find();
+
+            let actualConsent = await ConsentModel.findById(id)
+
+
+            const idEmpresa = actualConsent.empresa.id
+            //const idUsuario = email.idUsuario
+
+
+
+            const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
+            const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
+            //console.log("esta es el array", bloqueAnteriorEmpresaArray)
+            let hashEmpresaAnterior;
+            let hashMainAnterior;
+            let heighEnterprise = 0
+            let bloqueAnteriorEmpresa;
+
+            if (bloqueAnteriorEmpresaArray.length > 0) {
+                // console.log("entre", bloqueAnteriorEmpresaArray.length)
+                bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
+                //console.log("bloque indivudal", bloqueAnteriorEmpresa)
+                // hashEmpresaAnterior = null
+                hashMainAnterior = bloqueAnteriorEmpresa.hashMain
+                heighEnterprise = bloqueAnteriorEmpresaArray.length
+                let bloquesCadena = await BlockchainModel.find({ enterpriseId: idEmpresa })
+                //console.log("se supone que el otro bloque", bloquesCadena)
+                if (bloquesCadena.length > 0) {
+                    console.log("entre al if")
+                    let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
+                    hashEmpresaAnterior = bloqueFinal.hashEnterprise
+                }
+
+            } else {
+                bloqueAnteriorEmpresa = null;
+                hashEmpresaAnterior = null
+                hashMainAnterior = null
+                heighEnterprise = 0
+            }
+
+            const blockNew = new BlockchainModel({
+                hashMain: null,
+                hashEnterprise: null,
+                previousHashEnterprise: hashEmpresaAnterior,
+                previousHashMain: bloqueAnterior.hashMain,
+                heigh: cadena.length,
+                heighEnterprise: heighEnterprise,
+                body: null,
+                body_enterprise: null,
+                data: actualConsent.data,
+                permisos: actualConsent.permisos,
+                userId: actualConsent.usuario.id,
+                enterpriseId: actualConsent.empresa.id,
+                fechaModificacion: strTime
+
+            })
+
+            let body = JSON.stringify(blockNew)
+
+            blockNew.body = body
+
+            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+            blockNew.body_enterprise = hashEnterprise
+            blockNew.hashMain = SHA256((body)).toString();
+            blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
+
+
+            await blockNew.save()
+
+
+            res.status(200).send({
+                status: true,
+                message: "Tratamiento actualizado"
+            })
+
+        } else {
+
+        }
+    }
+
+
+
+}
+
+//Borrar consentimiento
+
+UserCtrl.deleteConsent = async (req, res) => {
+
+    let id = req.params.id
+
+    let consent = await ConsentModel.findById(id)
+
+    if (!consent) {
+
+        res.status(400).send({
+            status: false,
+            message: "No existe el consentimiento"
+        })
+
+    } else {
+
+        await ConsentModel.findByIdAndDelete(req.params.id, { userFindAndModify: false }); //borramos el conseimtino
+
+
+        res.status(200).send({
+            status: true,
+            message: "Consentimeinto eliminado"
+        })
+
+    }
+
+}
+
+//Actualziar data
+
+UserCtrl.updateData = async (req, res) => {
+
+    let date = new Date();
+    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+    
+    let id = req.params.id
+
+    let user = await UserModel.findById(id)
+
+    if (!user) {
+        res.status(400).send({
+            status: false,
+            message: "El usuario no existe"
+        })
+    } else {
+
+        let consent = await ConsentModel.find({ "usuario.id": id })
+
+        
+        if (!consent) {
+
+            res.status(400).send({
+                status: false,
+                message: "El existen consentimientos de ese usuario"
+            })
+
+        } else {
+
+            let { data } = req.body
+
+
+
+            for (var k = 0; k < consent.length; k++) {
+                let existingData = consent[k].data
+                for (var i = 0; i < existingData.length; i++) {
+                    for (var j = 0; j < data.length; j++) {
+                        if (existingData[i].tipo === data[j].tipo) {
+                            existingData[i].valor = data[j].valor
+                        }
+
+                    }
+
+                }
+                consent[k].data = existingData
+
+                await consent[k].save()
+            }
+
+
+
+            let newConsents = await ConsentModel.find({"usuario.id":req.params.id})
+
+
+
+
+            for (var i = 0; i < newConsents.length; i++) {
+
+                const cadena = await BlockchainModel.find();
+
+                let actualConsent = newConsents[i]
+    
+                const idEmpresa = actualConsent.empresa.id
+                
+    
+    
+    
+                const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
+                const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
+                //console.log("esta es el array", bloqueAnteriorEmpresaArray)
+                let hashEmpresaAnterior;
+                let hashMainAnterior;
+                let heighEnterprise = 0
+                let bloqueAnteriorEmpresa;
+    
+                if (bloqueAnteriorEmpresaArray.length > 0) {
+                    // console.log("entre", bloqueAnteriorEmpresaArray.length)
+                    bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
+                    //console.log("bloque indivudal", bloqueAnteriorEmpresa)
+                    // hashEmpresaAnterior = null
+                    hashMainAnterior = bloqueAnteriorEmpresa.hashMain
+                    heighEnterprise = bloqueAnteriorEmpresaArray.length
+                    let bloquesCadena = await BlockchainModel.find({ enterpriseId: idEmpresa })
+                    //console.log("se supone que el otro bloque", bloquesCadena)
+                    if (bloquesCadena.length > 0) {
+                        console.log("entre al if")
+                        let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
+                        hashEmpresaAnterior = bloqueFinal.hashEnterprise
+                    }
+    
+                } else {
+                    bloqueAnteriorEmpresa = null;
+                    hashEmpresaAnterior = null
+                    hashMainAnterior = null
+                    heighEnterprise = 0
+                }
+    
+                const blockNew = new BlockchainModel({
+                    hashMain: null,
+                    hashEnterprise: null,
+                    previousHashEnterprise: hashEmpresaAnterior,
+                    previousHashMain: bloqueAnterior.hashMain,
+                    heigh: cadena.length,
+                    heighEnterprise: heighEnterprise,
+                    body: null,
+                    body_enterprise: null,
+                    data: actualConsent.data,
+                    permisos: actualConsent.permisos,
+                    userId: actualConsent.usuario.id,
+                    enterpriseId: actualConsent.empresa.id,
+                    fechaModificacion: strTime
+    
+                })
+    
+                let body = JSON.stringify(blockNew)
+    
+                blockNew.body = body
+    
+                const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+                blockNew.body_enterprise = hashEnterprise
+                blockNew.hashMain = SHA256((body)).toString();
+                blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
+    
+    
+                await blockNew.save()
+
+
+            }
+
+
+
+
+            res.status(200).send({
+                status: true,
+                message: "Data actualizada"
+            })
+
+        }
+    }
+
 
 }
 

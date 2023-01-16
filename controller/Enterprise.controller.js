@@ -127,7 +127,7 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
 
     let { email, descripcionConsentimeinto, permisos, data, fechaFin, observaciones } = req.body;
 
-    console.log(permisos)
+    //console.log(permisos)
     var idEmpresa = req.params.id
 
     let empresa = await EnterpriseModel.findById(idEmpresa)
@@ -141,6 +141,17 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
             let date = new Date();
 
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+            let consent = await ConsentModel.findOne({"empresa.id":idEmpresa,"usuario.id":usuario._id})
+
+            if(consent){
+
+                res.status(400).send({
+                    status: true,
+                    message:"Ya existe un consentimeinto aceptado, tendrás que eliminar el anterior si deseas crear unno nuevo"
+                })
+
+            }else{
 
             try {
 
@@ -181,9 +192,7 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
                 })
 
             }
-
-
-
+        }
 
         } else {
             res.json({
@@ -829,6 +838,41 @@ EnterpriseCtrl.getBlockChain = async(req,res)=>{
             }
         }
     }
+}
+
+
+//Obtener correos no respondidos
+
+EnterpriseCtrl.getEmailsDoesntAnswered = async(req,res)=>{
+
+    let id = req.params.id
+
+    let enterprise = await EnterpriseModel.findById(id)
+
+    if(!enterprise){
+    
+        let emails = await EmailModel.find({"empresa.id":id, respondido:false})
+
+        if(emails.length > 0){
+
+            res.status(200).send({
+                status: true,
+                emails: emails
+            })
+        }else{
+            res.status(400).send({
+                status: false,
+                message: "No hay emails"
+            })
+        }
+
+    }else{
+        res.status(400).send({
+            status: false,
+            message:"No existe la empresa"
+        })
+    }
+
 }
 
 
