@@ -12,6 +12,8 @@ const { findById } = require('../model/Email.model');
 const BlockchainModal = require('../model/Blockchain.modal');
 var XLSX = require('xlsx');
 const { RIPEMD160 } = require('crypto-js');
+var aspose = aspose || {};
+aspose.cells = require("aspose.cells");
 
 
 
@@ -1013,7 +1015,23 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
             const d = new Date(strTime);
-            let blockchain = await BlockchainModal.find({ userId: userId, enterpriseId: enterpriseId })
+            let blockchain = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
+
+            let blockchainSend  = []
+
+            for (var i = 0; i < blockchain.length; i++) {
+
+                let empresa = await EnterpriseModel.findById(blockchain[i].empresa.id)
+
+                blockchainSend[i] = {
+                    data: blockchain[i].data,
+                    permisos: blockchain[i].permisos,
+                    fechaFinConsentimiento:  blockchain[i].fechaFinConsentimeinto,
+                    nombreEmpresa: blockchain[i].empresa.nombre,
+                    emailEmpresa: empresa.email
+                }
+            }
+
 
 
             if (blockchain.length > 0) {
@@ -1021,28 +1039,47 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
                 if (type === "xlsx") {
 
+                    var temp = JSON.stringify(blockchainSend);
+
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.xlsx")
 
 
-                    var wb = XLSX.utils.book_new(); //new workbook
-                    var temp = JSON.stringify(blockchain.data);
-                    temp = JSON.parse(temp);
-                    var ws = XLSX.utils.json_to_sheet(temp);
-                    var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprisebyUser.xlsx`
-                    XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-                    XLSX.writeFile(wb, down);
-                    res.download(down);
-                    //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+                    
                 } else if (type === "csv") {
 
-                    var wb = XLSX.utils.book_new(); //new workbook
-                    var temp = JSON.stringify(blockchain);
-                    temp = JSON.parse(temp);
-                    var ws = XLSX.utils.json_to_sheet(temp);
-                    var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprisebyUser.csv`
-                    XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-                    XLSX.writeFile(wb, down);
+                    var temp = JSON.stringify(blockchainSend);
 
-                    res.download(down);
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.csv")
 
 
                 } else {

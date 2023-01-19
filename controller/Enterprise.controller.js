@@ -74,20 +74,20 @@ EnterpriseCtrl.createEnterprise = async (req, res) => {
 
 //Obtener empresa por id
 
-EnterpriseCtrl.getEnterpriseById = async(req,res)=>{
+EnterpriseCtrl.getEnterpriseById = async (req, res) => {
 
     let id = req.params.id
-    
+
     let enterprise = await EnterpriseModel.findById(id)
 
-    if(enterprise){
+    if (enterprise) {
 
         res.status(200).send({
             status: true,
             enterprise: enterprise
         })
 
-    }else{
+    } else {
         res.status(400).send({
             status: false,
             message: "No existe la empresa"
@@ -167,57 +167,57 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
 
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
-            let consent = await ConsentModel.findOne({"empresa.id":idEmpresa,"usuario.id":usuario._id})
+            let consent = await ConsentModel.findOne({ "empresa.id": idEmpresa, "usuario.id": usuario._id })
 
-            if(consent){
+            if (consent) {
 
                 res.status(400).send({
                     status: true,
-                    message:"Ya existe un consentimeinto aceptado, tendrás que eliminar el anterior si deseas crear unno nuevo"
+                    message: "Ya existe un consentimeinto aceptado, tendrás que eliminar el anterior si deseas crear unno nuevo"
                 })
 
-            }else{
+            } else {
 
-            try {
+                try {
 
-                let idUsuario = usuario._id
+                    let idUsuario = usuario._id
 
-                const NewEmail = new EmailModel({
-                    empresa: {
-                        id: empresa._id,
-                        name: empresa.name
-                    },
-                    usuario: {
-                        id: usuario._id,
-                        name: usuario.name
-                    },
-                    idUsuario: idUsuario,
-                    data: data,
-                    descripcionConcentimiento: descripcionConsentimeinto,
-                    permisos: permisos,
-                    fechaFin: fechaFin,
-                    obsevaciones: observaciones,
-                    fechaEnvio: strTime
+                    const NewEmail = new EmailModel({
+                        empresa: {
+                            id: empresa._id,
+                            name: empresa.name
+                        },
+                        usuario: {
+                            id: usuario._id,
+                            name: usuario.name
+                        },
+                        idUsuario: idUsuario,
+                        data: data,
+                        descripcionConcentimiento: descripcionConsentimeinto,
+                        permisos: permisos,
+                        fechaFin: fechaFin,
+                        obsevaciones: observaciones,
+                        fechaEnvio: strTime
 
 
 
-                })
+                    })
 
-                await NewEmail.save()
+                    await NewEmail.save()
 
-                res.json({
-                    status: "Email Enviado"
-                })
+                    res.json({
+                        status: "Email Enviado"
+                    })
 
-            } catch (error) {
-                console.log(error)
+                } catch (error) {
+                    console.log(error)
 
-                res.json({
-                    status: "Error al envíar correo"
-                })
+                    res.json({
+                        status: "Error al envíar correo"
+                    })
 
+                }
             }
-        }
 
         } else {
             res.json({
@@ -533,91 +533,95 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
             status: false,
             message: "No existe la empresa"
         })
-    }else{
-
-    let user = await UserModal.findById(userId)
-
-    if (!user) {
-        res.status(400).send({
-            status: false,
-            message: "No existe el usuario"
-        })
-    }else{
-
-
-    let blockchain = await BlockchainModal.find({ userId: userId, enterpriseId: enterpriseId })
-    
-    /*for(var i = 0; i< blockchain.length; i++){
-        blockchain[i].data = JSON.stringify(blockchain[i].data)
-        //blockchain[i].data = JSON.parse(blockchain[i].data)
-
-        blockchain[i].permisos = JSON.stringify(blockchain[i].permisos)
-        //blockchain[i].permisos = JSON.parse(blockchain[i].permisos)
-    }*/
-    
-    console.log(blockchain[0])
-
-    let date = Date()
-    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
-
-    const d = new Date(strTime);
-
-
-    if (type === "xlsx") {
-
-
-        /*
-        var wb = XLSX.utils.book_new(); //new workbook
-        var temp = JSON.stringify(blockchain);
-        temp = JSON.parse(temp);
-        var ws = XLSX.utils.json_to_sheet(temp);
-        var down = __dirname + `/public/${d.getDay()}-exportdataUser.xlsx`
-        XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-        XLSX.writeFile(wb, down);
-        res.download(down);*/
-        //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
-
-        // create a blank Workbook object
-
-        var temp = JSON.stringify(blockchain);
-
-var workbook = aspose.cells.Workbook()
-
-// access default empty worksheet
-var worksheet = workbook.getWorksheets().get(0)
-
-// set JsonLayoutOptions for formatting
-var layoutOptions = aspose.cells.JsonLayoutOptions()
-layoutOptions.setArrayAsTable(true)
-
-// import JSON data to default worksheet starting at cell A1
-aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
-
-// save resultant file
-workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
-
-
-    } else if (type === "csv") {
-
-        var wb = XLSX.utils.book_new(); //new workbook
-        var temp = JSON.stringify(blockchain);
-        temp = JSON.parse(temp);
-        var ws = XLSX.utils.json_to_sheet(temp);
-        var down = __dirname + `/public/${d.getDay()}-exportdata.csv`
-        XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-        XLSX.writeFile(wb, down);
-
-        res.download(down);
-
-
     } else {
-        res.status(400).send({
-            status: true,
-            message: "No existe la extensión del archivo solicitada"
-        })
-    }
 
-    }
+        let user = await UserModal.findById(userId)
+
+        if (!user) {
+            res.status(400).send({
+                status: false,
+                message: "No existe el usuario"
+            })
+        } else {
+
+
+            let blockchain = await ConsentModel.find({ "usuario.id": userId, "empresa.id": enterpriseId })
+
+            let blockchainSend = []
+
+        for (var i = 0; i < blockchain.length; i++) {
+
+            blockchainSend[i] = {
+                data: blockchain[i].data,
+                permisos: blockchain[i].permisos,
+                fechaFinConsentimiento:  blockchain[i].fechaFinConsentimeinto
+            }
+        }
+
+
+
+            let date = Date()
+            let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+            const d = new Date(strTime);
+
+
+            if (type === "xlsx") {
+
+
+
+
+                var temp = JSON.stringify(blockchainSend);
+
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.xlsx")
+
+
+            } else if (type === "csv") {
+
+                
+                var temp = JSON.stringify(blockchainSend);
+
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.csv")
+
+
+            } else {
+                res.status(400).send({
+                    status: true,
+                    message: "No existe la extensión del archivo solicitada"
+                })
+            }
+
+        }
     }
 
 }
@@ -643,37 +647,67 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
         //db.users.find({awards: {$elemMatch: {award:'National Medal', year:1975}}})
 
 
-        let blockchain = await BlockchainModal.find({ enterpriseId: enterpriseId, permisos: { $elemMatch: { tipo: treatment } } })
+        let blockchain = await ConsentModel.find({ "empresa.id": enterpriseId, permisos: { $elemMatch: { tipo: treatment } }})
 
         let date = Date()
         let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
         const d = new Date(strTime);
 
+        let blockchainSend = []
+
+        for (var i = 0; i < blockchain.length; i++) {
+
+            blockchainSend[i] = {
+                data: blockchain[i].data,
+                permisos: blockchain[i].permisos,
+                fechaFinConsentimiento:  blockchain[i].fechaFinConsentimeinto
+            }
+        }
+
+
         if (type === "xlsx") {
 
+            var temp = JSON.stringify(blockchainSend);
+
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.xlsx")
 
 
-            var wb = XLSX.utils.book_new(); //new workbook
-            var temp = JSON.stringify(blockchain);
-            temp = JSON.parse(temp);
-            var ws = XLSX.utils.json_to_sheet(temp);
-            var down = __dirname + `/public/${d.getDay()}-exportdataTreatment.xlsx`
-            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-            XLSX.writeFile(wb, down);
-            res.download(down);
-            //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
         } else if (type === "csv") {
 
-            var wb = XLSX.utils.book_new(); //new workbook
-            var temp = JSON.stringify(blockchain);
-            temp = JSON.parse(temp);
-            var ws = XLSX.utils.json_to_sheet(temp);
-            var down = __dirname + `/public/${d.getDay()}-exportdata.csv`
-            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-            XLSX.writeFile(wb, down);
+            var temp = JSON.stringify(blockchainSend);
 
-            res.download(down);
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.csv")
 
 
         } else {
@@ -763,50 +797,82 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
         let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
         const d = new Date(strTime);
-        let blockchain = await BlockchainModal.find({ enterpriseId: enterpriseId })
+        let blockchain = await ConsentModel.find({ "empresa.id": enterpriseId })
 
 
-        if(blockchain.length > 0){
+        
 
 
-        if (type === "xlsx") {
+        if (blockchain.length > 0) {
+
+            let blockchainSend = []
+
+            for (var i = 0; i < blockchain.length; i++) {
+
+                blockchainSend[i] = {
+                    data: blockchain[i].data,
+                    permisos: blockchain[i].permisos,
+                    fechaFinConsentimiento:  blockchain[i].fechaFinConsentimeinto
+                }
+            }
+
+
+            if (type === "xlsx") {
 
 
 
-            var wb = XLSX.utils.book_new(); //new workbook
-            var temp = JSON.stringify(blockchain);
-            temp = JSON.parse(temp);
-            var ws = XLSX.utils.json_to_sheet(temp);
-            var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprise.xlsx`
-            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-            XLSX.writeFile(wb, down);
-            res.download(down);
-            //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
-        } else if (type === "csv") {
+                var temp = JSON.stringify(blockchainSend);
 
-            var wb = XLSX.utils.book_new(); //new workbook
-            var temp = JSON.stringify(blockchain);
-            temp = JSON.parse(temp);
-            var ws = XLSX.utils.json_to_sheet(temp);
-            var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprise.csv`
-            XLSX.utils.book_append_sheet(wb, ws, "sheet1");
-            XLSX.writeFile(wb, down);
+                var workbook = aspose.cells.Workbook()
 
-            res.download(down);
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.xlsx")
+            } else if (type === "csv") {
+
+                var temp = JSON.stringify(blockchainSend);
+
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.csv")
 
 
+            } else {
+                res.status(400).send({
+                    status: true,
+                    message: "No existe la extensión del archivo solicitada"
+                })
+            }
         } else {
             res.status(400).send({
                 status: true,
-                message: "No existe la extensión del archivo solicitada"
+                message: "No existen usuarios"
             })
         }
-    }else{
-        res.status(400).send({
-            status: true,
-            message: "No existen usuarios"
-        })
-    }
 
     }
 
@@ -815,7 +881,7 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
 //Obtener blockchain
 
 
-EnterpriseCtrl.getBlockChain = async(req,res)=>{
+EnterpriseCtrl.getBlockChain = async (req, res) => {
     let enterpriseId = req.params.enterpriseId
     let userId = req.params.userId
 
@@ -823,33 +889,33 @@ EnterpriseCtrl.getBlockChain = async(req,res)=>{
 
     let user = await UserModal.findById(userId)
 
-    if(!enterprise){
+    if (!enterprise) {
 
         res.status(400).send({
             status: false,
             message: "No existe la empresa"
         })
 
-    }else{
+    } else {
 
-        if(!user){  
-            
+        if (!user) {
+
             res.status(400).send({
                 status: false,
                 message: "No existe el usuario"
             })
 
 
-        }else{
+        } else {
 
-            let blockchain = await BlockchainModal.find({enterpriseId: enterpriseId, userId: userId})
+            let blockchain = await BlockchainModal.find({ enterpriseId: enterpriseId, userId: userId })
 
             let body = []
 
 
-            if(blockchain.length > 0){
+            if (blockchain.length > 0) {
 
-                
+
                 /*let body = [];
                 for(var i = 0; i < blockchain.length; i++){
                     body[i] =  JSON.parse(blockchain[i].body)
@@ -859,39 +925,39 @@ EnterpriseCtrl.getBlockChain = async(req,res)=>{
 
                 }*/
 
-               /* let prueba = [
-                    {
-                      _id: new ObjectId("63b647c5b3107e66230a14ca"),
-                      hashMain: 'b3f0e069b36e8632e8b40245d1811499f00945810cf3febe9b2e8b0d61e3bb62',
-                      hashEnterprise: '302113f89c075cbc4844c36c5700b9c68fb480593d48952aabcbe3259e072514',
-                      previousHashMain: null,
-                      previousHashEnterprise: null,
-                      heigh: 0,
-                      heighEnterprise: 0,
-                      body: '{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}',
-                      data: [ [Object], [Object], [Object] ],
-                      permisos: [ [Object], [Object] ],
-                      userId: new ObjectId("63b362dcb6d5635be00ea1a1"),
-                      enterpriseId: new ObjectId("63b362d8b6d5635be00ea19e"),
-                      fechaModificacion: '1/4/2023, 10:45:09 PM',
-                      __v: 0
-                    }
-                  ]*/
+                /* let prueba = [
+                     {
+                       _id: new ObjectId("63b647c5b3107e66230a14ca"),
+                       hashMain: 'b3f0e069b36e8632e8b40245d1811499f00945810cf3febe9b2e8b0d61e3bb62',
+                       hashEnterprise: '302113f89c075cbc4844c36c5700b9c68fb480593d48952aabcbe3259e072514',
+                       previousHashMain: null,
+                       previousHashEnterprise: null,
+                       heigh: 0,
+                       heighEnterprise: 0,
+                       body: '{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}',
+                       data: [ [Object], [Object], [Object] ],
+                       permisos: [ [Object], [Object] ],
+                       userId: new ObjectId("63b362dcb6d5635be00ea1a1"),
+                       enterpriseId: new ObjectId("63b362d8b6d5635be00ea19e"),
+                       fechaModificacion: '1/4/2023, 10:45:09 PM',
+                       __v: 0
+                     }
+                   ]*/
 
-                  //const s =  `{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}`
-                
-                console.log("holi",blockchain)
+                //const s =  `{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}`
+
+                console.log("holi", blockchain)
 
                 res.status(200).send({
                     status: true,
                     blockchain: blockchain
                 })
-            }else{
+            } else {
                 res.status(400).send({
                     status: false,
                     message: "No existe cadena"
                 })
-    
+
             }
         }
     }
@@ -900,35 +966,35 @@ EnterpriseCtrl.getBlockChain = async(req,res)=>{
 
 //Obtener correos no respondidos
 
-EnterpriseCtrl.getEmailsDoesntAnswered = async(req,res)=>{
+EnterpriseCtrl.getEmailsDoesntAnswered = async (req, res) => {
 
     let id = req.params.id
 
     let enterprise = await EnterpriseModel.findById(id)
 
-    if(enterprise){
-    
-        let emails = await EmailModel.find({"empresa.id":id, respondido:false})
+    if (enterprise) {
+
+        let emails = await EmailModel.find({ "empresa.id": id, respondido: false })
 
 
 
-        if(emails.length > 0){
+        if (emails.length > 0) {
 
             res.status(200).send({
                 status: true,
                 emails: emails
             })
-        }else{
+        } else {
             res.status(400).send({
                 status: false,
                 message: "No hay emails"
             })
         }
 
-    }else{
+    } else {
         res.status(400).send({
             status: false,
-            message:"No existe la empresa"
+            message: "No existe la empresa"
         })
     }
 
