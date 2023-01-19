@@ -70,7 +70,9 @@ router.put("/updateTreatmente/:id",UserCtrl.updateTreatmente)
 router.put("/updateData/:id", UserCtrl.updateData)
 
 
+//getUsers
 
+router.get("/getUserbyId/:id", userCtrl.getUserbyId)
 
 
 

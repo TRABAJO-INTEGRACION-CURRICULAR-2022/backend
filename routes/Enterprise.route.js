@@ -66,6 +66,10 @@ router.get("/getBlockChain/:enterpriseId/:userId", enterpriseCtrl.getBlockChain)
 
 router.get("/getEmailsDoesntAnswered/:id", enterpriseCtrl.getEmailsDoesntAnswered)
 
+//obtener empresa por id
+
+router.get("/getEnterpriseById/:id",enterpriseCtrl.getEnterpriseById)
+
 
 
 module.exports = router

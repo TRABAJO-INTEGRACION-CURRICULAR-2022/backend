@@ -70,6 +70,29 @@ EnterpriseCtrl.createEnterprise = async (req, res) => {
 
 };
 
+//Obtener empresa por id
+
+EnterpriseCtrl.getEnterpriseById = async(req,res)=>{
+
+    let id = req.params.id
+    
+    let enterprise = await EnterpriseModel.findById(id)
+
+    if(enterprise){
+
+        res.status(200).send({
+            status: true,
+            enterprise: enterprise
+        })
+
+    }else{
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+    }
+}
+
 //Actualizar una empresa
 EnterpriseCtrl.updateEnterprise = async (req, res) => {
     let { name, email, ruc, password } = req.body

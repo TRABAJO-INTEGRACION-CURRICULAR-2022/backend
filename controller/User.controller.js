@@ -76,6 +76,29 @@ UserCtrl.createUser = async (req, res) => {
 
 };
 
+//Obtener user por id
+
+UserCtrl.getUserbyId=async(req,res)=>{
+    let id = req.params.id
+
+    let user = await UserModel.findById(id)
+
+    if(user){
+
+        res.status(200).send({
+            status: true,
+            user: user
+        })
+
+    }else{
+
+        res.status(400).send({
+            status: false,
+            message: "No existe el usuario"
+        })
+
+    }
+}
 
 UserCtrl.login = async (req, res) => {
 
@@ -1050,7 +1073,7 @@ UserCtrl.updateTreatmente = async (req, res) => {
 
     let date = new Date();
     let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
-    console.log("entre")
+    
     let id = req.params.id
 
     let consent = await ConsentModel.findById(id)
@@ -1203,7 +1226,7 @@ UserCtrl.updateData = async (req, res) => {
     let date = new Date();
     let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
-    
+
     let id = req.params.id
 
     let user = await UserModel.findById(id)
@@ -1217,7 +1240,7 @@ UserCtrl.updateData = async (req, res) => {
 
         let consent = await ConsentModel.find({ "usuario.id": id })
 
-        
+
         if (!consent) {
 
             res.status(400).send({
@@ -1229,6 +1252,58 @@ UserCtrl.updateData = async (req, res) => {
 
             let { data } = req.body
 
+            let name, lastName, email, ci;
+
+
+            for (var i = 0; i < data.length; i++) {
+
+
+                if (data[i].tipo == "name") {
+                    name = data[i].value
+                }
+
+                if (data[i].tipo == "lastName") {
+                    lastName = data[i].value
+                }
+
+                if (data[i].tipo == "email") {
+                    email = data[i].value
+                }
+
+                if (data[i].tipo == "ci") {
+                    ci = data[i].value
+                }
+            }
+
+
+
+            const email2 = await UserModel.findOne({ email: email });
+            if (!email2) {
+
+                try {
+
+                    const nuevoUsuario = {
+                        name,
+                        lastName,
+                        email,
+                        ci,
+
+                    };
+
+
+                    await UserModel.findByIdAndUpdate(req.params.id, nuevoUsuario, { userFindAndModify: false });
+
+
+
+                } catch (error) {
+
+                    res.status(400).send({
+                        status: false,
+                        message: "error ala ctualziar data"
+                    })
+                }
+
+            }
 
 
             for (var k = 0; k < consent.length; k++) {
@@ -1249,7 +1324,7 @@ UserCtrl.updateData = async (req, res) => {
 
 
 
-            let newConsents = await ConsentModel.find({"usuario.id":req.params.id})
+            let newConsents = await ConsentModel.find({ "usuario.id": req.params.id })
 
 
 
@@ -1259,12 +1334,12 @@ UserCtrl.updateData = async (req, res) => {
                 const cadena = await BlockchainModel.find();
 
                 let actualConsent = newConsents[i]
-    
+
                 const idEmpresa = actualConsent.empresa.id
-                
-    
-    
-    
+
+
+
+
                 const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
                 const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
                 //console.log("esta es el array", bloqueAnteriorEmpresaArray)
@@ -1272,7 +1347,7 @@ UserCtrl.updateData = async (req, res) => {
                 let hashMainAnterior;
                 let heighEnterprise = 0
                 let bloqueAnteriorEmpresa;
-    
+
                 if (bloqueAnteriorEmpresaArray.length > 0) {
                     // console.log("entre", bloqueAnteriorEmpresaArray.length)
                     bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
@@ -1287,14 +1362,14 @@ UserCtrl.updateData = async (req, res) => {
                         let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
                         hashEmpresaAnterior = bloqueFinal.hashEnterprise
                     }
-    
+
                 } else {
                     bloqueAnteriorEmpresa = null;
                     hashEmpresaAnterior = null
                     hashMainAnterior = null
                     heighEnterprise = 0
                 }
-    
+
                 const blockNew = new BlockchainModel({
                     hashMain: null,
                     hashEnterprise: null,
@@ -1309,19 +1384,19 @@ UserCtrl.updateData = async (req, res) => {
                     userId: actualConsent.usuario.id,
                     enterpriseId: actualConsent.empresa.id,
                     fechaModificacion: strTime
-    
+
                 })
-    
+
                 let body = JSON.stringify(blockNew)
-    
+
                 blockNew.body = body
-    
+
                 const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
                 blockNew.body_enterprise = hashEnterprise
                 blockNew.hashMain = SHA256((body)).toString();
                 blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
-    
-    
+
+
                 await blockNew.save()
 
 
