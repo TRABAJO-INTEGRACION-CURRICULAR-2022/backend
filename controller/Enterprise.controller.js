@@ -9,6 +9,8 @@ const ConsentModel = require('../model/Consent.model');
 const TreatmentModel = require('../model/Treatment.model');
 var XLSX = require('xlsx');
 const fs = require("fs")
+var aspose = aspose || {};
+aspose.cells = require("aspose.cells");
 
 
 
@@ -544,6 +546,17 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
 
 
     let blockchain = await BlockchainModal.find({ userId: userId, enterpriseId: enterpriseId })
+    
+    /*for(var i = 0; i< blockchain.length; i++){
+        blockchain[i].data = JSON.stringify(blockchain[i].data)
+        //blockchain[i].data = JSON.parse(blockchain[i].data)
+
+        blockchain[i].permisos = JSON.stringify(blockchain[i].permisos)
+        //blockchain[i].permisos = JSON.parse(blockchain[i].permisos)
+    }*/
+    
+    console.log(blockchain[0])
+
     let date = Date()
     let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
@@ -553,7 +566,7 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
     if (type === "xlsx") {
 
 
-
+        /*
         var wb = XLSX.utils.book_new(); //new workbook
         var temp = JSON.stringify(blockchain);
         temp = JSON.parse(temp);
@@ -561,8 +574,29 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
         var down = __dirname + `/public/${d.getDay()}-exportdataUser.xlsx`
         XLSX.utils.book_append_sheet(wb, ws, "sheet1");
         XLSX.writeFile(wb, down);
-        res.download(down);
+        res.download(down);*/
         //fs.unlink(__dirname + `/public/${d.getDay()}-exportdata.xlsx`)
+
+        // create a blank Workbook object
+
+        var temp = JSON.stringify(blockchain);
+
+var workbook = aspose.cells.Workbook()
+
+// access default empty worksheet
+var worksheet = workbook.getWorksheets().get(0)
+
+// set JsonLayoutOptions for formatting
+var layoutOptions = aspose.cells.JsonLayoutOptions()
+layoutOptions.setArrayAsTable(true)
+
+// import JSON data to default worksheet starting at cell A1
+aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+// save resultant file
+workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+
+
     } else if (type === "csv") {
 
         var wb = XLSX.utils.book_new(); //new workbook

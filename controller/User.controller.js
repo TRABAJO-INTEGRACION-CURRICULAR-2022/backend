@@ -1024,7 +1024,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
 
                     var wb = XLSX.utils.book_new(); //new workbook
-                    var temp = JSON.stringify(blockchain);
+                    var temp = JSON.stringify(blockchain.data);
                     temp = JSON.parse(temp);
                     var ws = XLSX.utils.json_to_sheet(temp);
                     var down = __dirname + `/public/${d.getDay()}-exportdataAllEnterprisebyUser.xlsx`
