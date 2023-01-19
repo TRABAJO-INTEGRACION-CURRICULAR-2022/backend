@@ -531,7 +531,7 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
             status: false,
             message: "No existe la empresa"
         })
-    }
+    }else{
 
     let user = await UserModal.findById(userId)
 
@@ -540,7 +540,7 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
             status: false,
             message: "No existe el usuario"
         })
-    }
+    }else{
 
 
     let blockchain = await BlockchainModal.find({ userId: userId, enterpriseId: enterpriseId })
@@ -583,8 +583,8 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
         })
     }
 
-
-
+    }
+    }
 
 }
 
