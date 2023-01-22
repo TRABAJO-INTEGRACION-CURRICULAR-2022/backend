@@ -505,7 +505,8 @@ UserCtrl.acceptConsent = async (req, res) => {
                             permisos: permisosTrue,
                             data: data,
                             fechaModificacion: strTime,
-                            fechaFinConsentimeinto: email.fechaFin
+                            fechaFinConsentimeinto: email.fechaFin,
+                            activo: true
                         })
 
                         await newConsent.save()
@@ -614,7 +615,8 @@ UserCtrl.acceptConsent = async (req, res) => {
                             permisos: permisosTrue,
                             data: data,
                             fechaModificacion: strTime,
-                            fechaFinConsentimeinto: email.fechaFin
+                            fechaFinConsentimeinto: email.fechaFin,
+                            activo: true
                         })
 
                         await newConsent.save()
@@ -1296,19 +1298,19 @@ UserCtrl.updateData = async (req, res) => {
 
 
                 if (data[i].tipo == "name") {
-                    name = data[i].value
+                    name = data[i].valor
                 }
 
                 if (data[i].tipo == "lastName") {
-                    lastName = data[i].value
+                    lastName = data[i].valor
                 }
 
                 if (data[i].tipo == "email") {
-                    email = data[i].value
+                    email = data[i].valor
                 }
 
                 if (data[i].tipo == "ci") {
-                    ci = data[i].value
+                    ci = data[i].valor
                 }
             }
 
@@ -1451,6 +1453,44 @@ UserCtrl.updateData = async (req, res) => {
     }
 
 
+}
+
+
+//Obtener historial
+
+UserCtrl.getHistory = async(req,res)=>{
+    let id = req.params.id
+
+    let user = await UserModel.findById(id)
+
+
+    if(!user){
+
+        res.status(400).send({
+            status: false,
+            message: "El usuario no existe"
+        })
+
+    }else{
+
+        let consents = await ConsentModel.find({"usuario.id":id, activo:false})
+
+        if(consents.length > 0){
+
+            res.status(200).send({
+                status: true,
+                consents: consents
+            })
+
+        }else{
+            res.status(400).send({
+                status: false,
+                message: "No existe historial"
+            })
+        }
+
+
+    }
 }
 
 

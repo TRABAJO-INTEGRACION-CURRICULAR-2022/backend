@@ -18,7 +18,9 @@ cron.schedule('* 23 * * *', async () => {
         let dateWithFormat = new Date(date)
 
         if(today.getDay()=== dateWithFormat.getDay()){
-            await ConsentModel.findByIdAndDelete(consents[i]._id, { userFindAndModify: false });       
+            //await ConsentModel.findByIdAndDelete(consents[i]._id, { userFindAndModify: false });       
+            consents[i].activo = false
+            await consents[i].save()
         }
     }
 

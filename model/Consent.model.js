@@ -20,7 +20,8 @@ const ConsetSchema = new Schema({
         
         }],
     fechaModificacion: {type: String},
-    fechaFinConsentimeinto: {type: String}
+    fechaFinConsentimeinto: {type: String},
+    activo: {type: Boolean}
     
 });
 

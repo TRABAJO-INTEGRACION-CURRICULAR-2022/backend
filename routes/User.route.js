@@ -74,6 +74,10 @@ router.put("/updateData/:id", UserCtrl.updateData)
 
 router.get("/getUserbyId/:id", userCtrl.getUserbyId)
 
+//Obtener historial
+
+router.get("/getHistory/:id", userCtrl.getHistory)
+
 
 
 module.exports = router
