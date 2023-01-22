@@ -1,9 +1,0 @@
-data,,,permisos,,,,,fechaFinConsentimiento,emailEmpresa
-tipo,_id,valor,tipo,valor,descripcion,data,_id,,
-nombre,63bf788a7eab879ae1a110e9,Javier,Facturacion Electronica,TRUE,Descripcion Facturacion Electronica,nombre,63bf6e877eab879ae1a1106c,18/1/2023,boris@Pichincha.com
-nombre,63bf796f7eab879ae1a111ce,Javier,Marketing,TRUE,Descripcion MArketing,nombre,63bf79567eab879ae1a1118a,20/1/2023,boris@Pichincha.com
-nombre,63c093f2330bb509fffaed82,Nombre1,Facturacion Electronica,TRUE,Descripcion Facturacion Electronica,nombre,63c093a2330bb509fffaed24,20/1/2023,boris@Pichincha.com
-name,63c4bcd77d405de464c87ecc,Milann,Tratamiento empresa2,TRUE,Tratamiento empresa2,name,63c4bcae7d405de464c87e4e,27/1/2023,empresa2@hotmail.com
-name,63c4c1a17d405de464c88197,Milann,Tratamiento Prueba,TRUE,Tratamiento Prueba,name,63c4c0147d405de464c8807d,20/1/2023,boris@Pichincha.com
-direccion,63c4c1a17d405de464c88198,Direccion m,,,,direccion,,,
-Evaluation Only. Created with Aspose.Cells for Node.js via Java.Copyright 2003 - 2023 Aspose Pty Ltd.

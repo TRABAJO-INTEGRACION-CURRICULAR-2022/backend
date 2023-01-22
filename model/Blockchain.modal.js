@@ -21,6 +21,7 @@ const BlockchainSchema = new Schema({
     userId: { type: mongoose.Types.ObjectId, required: true, ref: 'user' },
     enterpriseId: { type: mongoose.Types.ObjectId, required: true, ref: 'enterprise' },
     fechaModificacion: {type: String},
+    fechaFinConsentimeinto:{type: String}
     
 });
 

@@ -239,7 +239,7 @@ EnterpriseCtrl.getUsers = async (req, res) => {
 
     console.log(req.params.id)
 
-    let users = await ConsentModel.find({ "empresa.id": req.params.id })
+    let users = await ConsentModel.find({ "empresa.id": req.params.id, activo: true })
 
     if (users.length > 0) {
 
@@ -321,7 +321,7 @@ EnterpriseCtrl.getUsers = async (req, res) => {
 
     if (enterprise) {
         let usersSend = []
-        let users = await ConsentModel.find({ "empresa.id": id })
+        let users = await ConsentModel.find({ "empresa.id": id, activo: true })
 
         for (var i = 0; i < users.length; i++) {
 

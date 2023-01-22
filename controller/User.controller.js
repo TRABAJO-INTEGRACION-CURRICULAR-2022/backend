@@ -11,7 +11,7 @@ const SHA256 = require("crypto-js/sha256");
 const { findById } = require('../model/Email.model');
 const BlockchainModal = require('../model/Blockchain.modal');
 var XLSX = require('xlsx');
-const { RIPEMD160 } = require('crypto-js');
+const { RIPEMD160, TripleDES } = require('crypto-js');
 var aspose = aspose || {};
 aspose.cells = require("aspose.cells");
 
@@ -80,19 +80,19 @@ UserCtrl.createUser = async (req, res) => {
 
 //Obtener user por id
 
-UserCtrl.getUserbyId=async(req,res)=>{
+UserCtrl.getUserbyId = async (req, res) => {
     let id = req.params.id
 
     let user = await UserModel.findById(id)
 
-    if(user){
+    if (user) {
 
         res.status(200).send({
             status: true,
             user: user
         })
 
-    }else{
+    } else {
 
         res.status(400).send({
             status: false,
@@ -418,7 +418,7 @@ UserCtrl.acceptConsent = async (req, res) => {
 
     var email = await EmailModel.findById(idEmail)
 
-    var { permisos, data } = req.body
+    var { permisos, data, fechaFin } = req.body
 
     if (!permisos) {
 
@@ -467,7 +467,8 @@ UserCtrl.acceptConsent = async (req, res) => {
                             permisos: permisosAux,
                             userId: email.usuario.id,
                             enterpriseId: email.empresa.id,
-                            fechaModificacion: strTime
+                            fechaModificacion: strTime,
+                            fechaFinConsentimeinto: fechaFin
 
                         })
 
@@ -505,7 +506,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                             permisos: permisosTrue,
                             data: data,
                             fechaModificacion: strTime,
-                            fechaFinConsentimeinto: email.fechaFin,
+                            fechaFinConsentimeinto: fechaFin,
                             activo: true
                         })
 
@@ -574,7 +575,8 @@ UserCtrl.acceptConsent = async (req, res) => {
                             permisos: permisosAux,
                             userId: email.usuario.id,
                             enterpriseId: email.empresa.id,
-                            fechaModificacion: strTime
+                            fechaModificacion: strTime,
+                            fechaFinConsentimeinto: fechaFin
 
                         })
 
@@ -615,7 +617,7 @@ UserCtrl.acceptConsent = async (req, res) => {
                             permisos: permisosTrue,
                             data: data,
                             fechaModificacion: strTime,
-                            fechaFinConsentimeinto: email.fechaFin,
+                            fechaFinConsentimeinto: fechaFin,
                             activo: true
                         })
 
@@ -942,7 +944,7 @@ UserCtrl.getEnterprisestreatments = async (req, res) => {
     let user = await UserModel.findById(id)
 
     if (user) {
-        let consents = await ConsentModel.find({ "usuario.id": id })
+        let consents = await ConsentModel.find({ "usuario.id": id, activo: true })
 
         let sendConsent = []
 
@@ -1019,7 +1021,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
             const d = new Date(strTime);
             let blockchain = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
 
-            let blockchainSend  = []
+            let blockchainSend = []
 
             for (var i = 0; i < blockchain.length; i++) {
 
@@ -1028,7 +1030,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
                 blockchainSend[i] = {
                     data: blockchain[i].data,
                     permisos: blockchain[i].permisos,
-                    fechaFinConsentimiento:  blockchain[i].fechaFinConsentimeinto,
+                    fechaFinConsentimiento: blockchain[i].fechaFinConsentimeinto,
                     nombreEmpresa: blockchain[i].empresa.nombre,
                     emailEmpresa: empresa.email
                 }
@@ -1043,45 +1045,45 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
                     var temp = JSON.stringify(blockchainSend);
 
-                var workbook = aspose.cells.Workbook()
+                    var workbook = aspose.cells.Workbook()
 
-                // access default empty worksheet
-                var worksheet = workbook.getWorksheets().get(0)
+                    // access default empty worksheet
+                    var worksheet = workbook.getWorksheets().get(0)
 
-                // set JsonLayoutOptions for formatting
-                var layoutOptions = aspose.cells.JsonLayoutOptions()
-                layoutOptions.setArrayAsTable(true)
+                    // set JsonLayoutOptions for formatting
+                    var layoutOptions = aspose.cells.JsonLayoutOptions()
+                    layoutOptions.setArrayAsTable(true)
 
-                // import JSON data to default worksheet starting at cell A1
-                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+                    // import JSON data to default worksheet starting at cell A1
+                    aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
 
-                // save resultant file
-                workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
+                    // save resultant file
+                    workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
 
-                res.download("output.xlsx")
+                    res.download("output.xlsx")
 
 
-                    
+
                 } else if (type === "csv") {
 
                     var temp = JSON.stringify(blockchainSend);
 
-                var workbook = aspose.cells.Workbook()
+                    var workbook = aspose.cells.Workbook()
 
-                // access default empty worksheet
-                var worksheet = workbook.getWorksheets().get(0)
+                    // access default empty worksheet
+                    var worksheet = workbook.getWorksheets().get(0)
 
-                // set JsonLayoutOptions for formatting
-                var layoutOptions = aspose.cells.JsonLayoutOptions()
-                layoutOptions.setArrayAsTable(true)
+                    // set JsonLayoutOptions for formatting
+                    var layoutOptions = aspose.cells.JsonLayoutOptions()
+                    layoutOptions.setArrayAsTable(true)
 
-                // import JSON data to default worksheet starting at cell A1
-                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+                    // import JSON data to default worksheet starting at cell A1
+                    aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
 
-                // save resultant file
-                workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+                    // save resultant file
+                    workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
 
-                res.download("output.csv")
+                    res.download("output.csv")
 
 
                 } else {
@@ -1112,7 +1114,7 @@ UserCtrl.updateTreatmente = async (req, res) => {
 
     let date = new Date();
     let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
-    
+
     let id = req.params.id
 
     let consent = await ConsentModel.findById(id)
@@ -1235,6 +1237,10 @@ UserCtrl.deleteConsent = async (req, res) => {
 
     let id = req.params.id
 
+    let date = new Date();
+    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+
     let consent = await ConsentModel.findById(id)
 
     if (!consent) {
@@ -1246,7 +1252,85 @@ UserCtrl.deleteConsent = async (req, res) => {
 
     } else {
 
-        await ConsentModel.findByIdAndDelete(req.params.id, { userFindAndModify: false }); //borramos el conseimtino
+        consent.activo = false
+        consent.fechaFinConsentimeinto = strTime
+
+
+        await consent.save()
+
+        await consent.save()
+
+
+        let actualConsent = await ConsentModel.findById(id)
+
+        const cadena = await BlockchainModel.find();
+
+
+        const idEmpresa = actualConsent.empresa.id
+
+
+
+
+        const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
+        const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
+        //console.log("esta es el array", bloqueAnteriorEmpresaArray)
+        let hashEmpresaAnterior;
+        let hashMainAnterior;
+        let heighEnterprise = 0
+        let bloqueAnteriorEmpresa;
+
+        if (bloqueAnteriorEmpresaArray.length > 0) {
+            // console.log("entre", bloqueAnteriorEmpresaArray.length)
+            bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
+            //console.log("bloque indivudal", bloqueAnteriorEmpresa)
+            // hashEmpresaAnterior = null
+            hashMainAnterior = bloqueAnteriorEmpresa.hashMain
+            heighEnterprise = bloqueAnteriorEmpresaArray.length
+            let bloquesCadena = await BlockchainModel.find({ enterpriseId: idEmpresa })
+            //console.log("se supone que el otro bloque", bloquesCadena)
+            if (bloquesCadena.length > 0) {
+                console.log("entre al if")
+                let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
+                hashEmpresaAnterior = bloqueFinal.hashEnterprise
+            }
+
+        } else {
+            bloqueAnteriorEmpresa = null;
+            hashEmpresaAnterior = null
+            hashMainAnterior = null
+            heighEnterprise = 0
+        }
+
+        const blockNew = new BlockchainModel({
+            hashMain: null,
+            hashEnterprise: null,
+            previousHashEnterprise: hashEmpresaAnterior,
+            previousHashMain: bloqueAnterior.hashMain,
+            heigh: cadena.length,
+            heighEnterprise: heighEnterprise,
+            body: null,
+            body_enterprise: null,
+            data: actualConsent.data,
+            permisos: actualConsent.permisos,
+            userId: actualConsent.usuario.id,
+            enterpriseId: actualConsent.empresa.id,
+            fechaModificacion: strTime,
+            fechaFinConsentimeinto: strTime
+
+        })
+
+        let body = JSON.stringify(blockNew)
+
+        blockNew.body = body
+
+        const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+        blockNew.body_enterprise = hashEnterprise
+        blockNew.hashMain = SHA256((body)).toString();
+        blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
+
+
+        await blockNew.save()
+
 
 
         res.status(200).send({
@@ -1358,6 +1442,7 @@ UserCtrl.updateData = async (req, res) => {
                 }
                 consent[k].data = existingData
 
+
                 await consent[k].save()
             }
 
@@ -1422,7 +1507,8 @@ UserCtrl.updateData = async (req, res) => {
                     permisos: actualConsent.permisos,
                     userId: actualConsent.usuario.id,
                     enterpriseId: actualConsent.empresa.id,
-                    fechaModificacion: strTime
+                    fechaModificacion: strTime,
+                    fechaFinConsentimeinto: actualConsent.fechaFinConsentimeinto
 
                 })
 
@@ -1455,39 +1541,159 @@ UserCtrl.updateData = async (req, res) => {
 
 }
 
+//Editar Fecha Fin consentimeinto 
+
+UserCtrl.updateDateEndConsent = async (req, res) => {
+
+    let id = req.params.id
+
+    let consent = await ConsentModel.findById(id)
+    let date = new Date();
+    let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+
+    if (!consent) {
+
+        res.status(400).send({
+            status: false,
+            message: "No existe el conentimeinto"
+        })
+
+    } else {
+
+        let { fechaFin } = req.body
+
+
+        if (!fechaFin) {
+
+            res.status(400).send({
+                status: false,
+                message: "No existe la fecha"
+            })
+
+        } else {
+
+            consent.fechaFinConsentimeinto = fechaFin
+
+
+
+            await consent.save()
+
+
+            let actualConsent = await ConsentModel.findById(id)
+
+            const cadena = await BlockchainModel.find();
+
+
+            const idEmpresa = actualConsent.empresa.id
+
+
+
+
+            const bloqueAnterior = await BlockchainModel.findOne({ heigh: cadena.length - 1 })
+            const bloqueAnteriorEmpresaArray = await BlockchainModel.find({ enterpriseId: idEmpresa })
+            //console.log("esta es el array", bloqueAnteriorEmpresaArray)
+            let hashEmpresaAnterior;
+            let hashMainAnterior;
+            let heighEnterprise = 0
+            let bloqueAnteriorEmpresa;
+
+            if (bloqueAnteriorEmpresaArray.length > 0) {
+                // console.log("entre", bloqueAnteriorEmpresaArray.length)
+                bloqueAnteriorEmpresa = await BlockchainModel.findOne({ heighEnterprise: bloqueAnteriorEmpresaArray.length - 1 })
+                //console.log("bloque indivudal", bloqueAnteriorEmpresa)
+                // hashEmpresaAnterior = null
+                hashMainAnterior = bloqueAnteriorEmpresa.hashMain
+                heighEnterprise = bloqueAnteriorEmpresaArray.length
+                let bloquesCadena = await BlockchainModel.find({ enterpriseId: idEmpresa })
+                //console.log("se supone que el otro bloque", bloquesCadena)
+                if (bloquesCadena.length > 0) {
+                    console.log("entre al if")
+                    let bloqueFinal = bloquesCadena[bloquesCadena.length - 1]
+                    hashEmpresaAnterior = bloqueFinal.hashEnterprise
+                }
+
+            } else {
+                bloqueAnteriorEmpresa = null;
+                hashEmpresaAnterior = null
+                hashMainAnterior = null
+                heighEnterprise = 0
+            }
+
+            const blockNew = new BlockchainModel({
+                hashMain: null,
+                hashEnterprise: null,
+                previousHashEnterprise: hashEmpresaAnterior,
+                previousHashMain: bloqueAnterior.hashMain,
+                heigh: cadena.length,
+                heighEnterprise: heighEnterprise,
+                body: null,
+                body_enterprise: null,
+                data: actualConsent.data,
+                permisos: actualConsent.permisos,
+                userId: actualConsent.usuario.id,
+                enterpriseId: actualConsent.empresa.id,
+                fechaModificacion: strTime,
+                fechaFinConsentimeinto: fechaFin
+
+            })
+
+            let body = JSON.stringify(blockNew)
+
+            blockNew.body = body
+
+            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+            blockNew.body_enterprise = hashEnterprise
+            blockNew.hashMain = SHA256((body)).toString();
+            blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
+
+
+            await blockNew.save()
+
+
+            res.status(200).send({
+                status: true,
+                message: "Fecha de finalización de consentimeinto actualizada"
+            })
+        }
+
+    }
+}
+
 
 //Obtener historial
 
-UserCtrl.getHistory = async(req,res)=>{
+UserCtrl.getHistory = async (req, res) => {
     let id = req.params.id
 
     let user = await UserModel.findById(id)
 
 
-    if(!user){
+    if (!user) {
 
         res.status(400).send({
             status: false,
             message: "El usuario no existe"
         })
 
-    }else{
+    } else {
 
-        let consents = await ConsentModel.find({"usuario.id":id, activo:false})
+        let consents = await ConsentModel.find({ "usuario.id": id })
 
-        if(consents.length > 0){
+        let sendConsent = []
 
-            res.status(200).send({
-                status: true,
-                consents: consents
-            })
-
-        }else{
-            res.status(400).send({
-                status: false,
-                message: "No existe historial"
-            })
+        for (var i = 0; i < consents.length; i++) {
+            sendConsent[i] = {
+                _id: consents[i]._id,
+                fechaFin: consents[i].fechaFinConsentimeinto,
+                name: consents[i].empresa.name
+            }
         }
+
+        res.send(sendConsent)
+
+        
+        
 
 
     }

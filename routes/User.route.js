@@ -79,5 +79,9 @@ router.get("/getUserbyId/:id", userCtrl.getUserbyId)
 router.get("/getHistory/:id", userCtrl.getHistory)
 
 
+//acyualziar fecha fin
+
+router.put("/updateDateEndConsent/:id",userCtrl.updateDateEndConsent)
+
 
 module.exports = router
