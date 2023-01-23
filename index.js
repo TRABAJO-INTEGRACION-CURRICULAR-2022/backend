@@ -21,8 +21,8 @@ app.use((req, res, next) => {
 
 //Ajustes Configiracion del puerto
 //solicitar el puerto disponible
-app.set("port", config.PORT);
-//app.set("port", 8000);
+//app.set("port", config.PORT);
+app.set("port", 8000);
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());

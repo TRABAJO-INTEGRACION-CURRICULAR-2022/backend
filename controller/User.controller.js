@@ -12,8 +12,8 @@ const { findById } = require('../model/Email.model');
 const BlockchainModal = require('../model/Blockchain.modal');
 var XLSX = require('xlsx');
 const { RIPEMD160, TripleDES } = require('crypto-js');
-var aspose = aspose || {};
-aspose.cells = require("aspose.cells");
+//var aspose = aspose || {};
+//aspose.cells = require("aspose.cells");
 
 
 
@@ -984,6 +984,7 @@ UserCtrl.getEnterprisetreatment = async (req, res) => {
     }
 }
 
+/********************* 
 //Exportar data
 UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
@@ -1021,57 +1022,76 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
             const d = new Date(strTime);
             let consents = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
 
-           /* let test = []
+         
 
+            
 
-            for(var i =0 ; i < consents.length; i++){
+            let permisos = consents[0].permisos[0].data
 
-                let consent = consents[i]
+            let data = consents[0].data
 
-                for(var j = 0; j < consent.permisos.length; j++ ){
+            let send_1 = []
 
-                    let dataPermisos = consent.permisos[i].data
+            let contador_2 = 0
 
-                    for(var k = 0; k < dataPermisos; k++){
-                        for(var l  = 0; l < consent.data;l++){
+            let arrayPermisos = []
 
-                            if(consent.data[i].tipo === dataPermisos[i]){
+            let name = consents[0].empresa.name  
 
-                                let tipo = consent.data.tipo
-                                let valor = consent.data.valor
+            for(var i = 0; i < permisos.length;i++){
 
-                                test[i]={
-                                    tipo:
-                                }
+                for(var j = 0; j < data.length;j++){
 
+                    if(permisos[i] === data[j].tipo){
 
-                            }
-                        }
-
+                        arrayPermisos.push(1)
+                         
+                        
+                        
+                    }else{
+                        arrayPermisos.push(0)
                     }
-                    
-                }
-            }*/
 
+                    contador_2 = contador_2 + 1
+
+
+                }
+
+                send_1[i] = {
+                    name:  name,
+                    permisos: arrayPermisos
+                }
+
+                arrayPermisos = []
+            }
+
+            console.log("sasa",send_1)
+
+
+
+            
             let send = []
 
             let contador  = 0
 
             for(var i = 0; i < consents.length ;i++){
 
-                
+                let consent = consents[i]
 
-                for(var j = 0; j < consents[i].data.length;j++){
+                for(var j = 0; j < consent.data.length;j++){
                     
                     send[contador] = {
-                        tipo:  consents[i].data[j].tipo,
-                        valor:  consents[i].data[j].valor
+                        tipo:  consent.data[j].tipo,
+                        valor:  consent.data[j].valor
     
                     }
 
                     contador = contador + 1
 
+
                 }
+
+               
 
               
             }
@@ -1153,7 +1173,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
     }
 
 }
-
+*/
 
 //Actualziar tratamiento
 

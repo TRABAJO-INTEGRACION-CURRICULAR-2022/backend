@@ -9,8 +9,8 @@ const ConsentModel = require('../model/Consent.model');
 const TreatmentModel = require('../model/Treatment.model');
 var XLSX = require('xlsx');
 const fs = require("fs")
-var aspose = aspose || {};
-aspose.cells = require("aspose.cells");
+//var aspose = aspose || {};
+//aspose.cells = require("aspose.cells");
 
 
 
@@ -519,7 +519,7 @@ EnterpriseCtrl.getTreatment = async (req, res) => {
 
 
 //Descargar historial de usuario
-
+/*
 EnterpriseCtrl.exportDatabyUser = async (req, res) => {
 
     let enterpriseId = req.params.enterpriseId
@@ -722,7 +722,7 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
 
 
 }
-
+*/
 
 //Filtro  por tratamiento
 
@@ -777,7 +777,7 @@ EnterpriseCtrl.getUsersByTreatment = async (req, res) => {
 }
 
 //Exportar toda data empresa
-
+/*
 EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
 
     let enterpriseId = req.params.enterpriseId
@@ -877,7 +877,7 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
     }
 
 }
-
+*/
 //Obtener blockchain
 
 
