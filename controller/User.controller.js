@@ -1019,31 +1019,78 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
             const d = new Date(strTime);
-            let blockchain = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
+            let consents = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
 
-            let blockchainSend = []
+           /* let test = []
 
-            for (var i = 0; i < blockchain.length; i++) {
 
-                let empresa = await EnterpriseModel.findById(blockchain[i].empresa.id)
+            for(var i =0 ; i < consents.length; i++){
 
-                blockchainSend[i] = {
-                    data: blockchain[i].data,
-                    permisos: blockchain[i].permisos,
-                    fechaFinConsentimiento: blockchain[i].fechaFinConsentimeinto,
-                    nombreEmpresa: blockchain[i].empresa.nombre,
-                    emailEmpresa: empresa.email
+                let consent = consents[i]
+
+                for(var j = 0; j < consent.permisos.length; j++ ){
+
+                    let dataPermisos = consent.permisos[i].data
+
+                    for(var k = 0; k < dataPermisos; k++){
+                        for(var l  = 0; l < consent.data;l++){
+
+                            if(consent.data[i].tipo === dataPermisos[i]){
+
+                                let tipo = consent.data.tipo
+                                let valor = consent.data.valor
+
+                                test[i]={
+                                    tipo:
+                                }
+
+
+                            }
+                        }
+
+                    }
+                    
                 }
+            }*/
+
+            let send = []
+
+            let contador  = 0
+
+            for(var i = 0; i < consents.length ;i++){
+
+                
+
+                for(var j = 0; j < consents[i].data.length;j++){
+                    
+                    send[contador] = {
+                        tipo:  consents[i].data[j].tipo,
+                        valor:  consents[i].data[j].valor
+    
+                    }
+
+                    contador = contador + 1
+
+                }
+
+              
             }
+            
+
+            console.log(send)
 
 
 
-            if (blockchain.length > 0) {
+           
+
+
+
+            if (consents.length > 0) {
 
 
                 if (type === "xlsx") {
 
-                    var temp = JSON.stringify(blockchainSend);
+                    var temp = JSON.stringify(send);
 
                     var workbook = aspose.cells.Workbook()
 
