@@ -14,6 +14,7 @@ var XLSX = require('xlsx');
 const { RIPEMD160, TripleDES } = require('crypto-js');
 //var aspose = aspose || {};
 //aspose.cells = require("aspose.cells");
+//var json2xlsx = require('node-json-xlsx');
 
 
 
@@ -944,7 +945,7 @@ UserCtrl.getEnterprisestreatments = async (req, res) => {
     let user = await UserModel.findById(id)
 
     if (user) {
-        let consents = await ConsentModel.find({ "usuario.id": id, activo: true })
+        let consents = await ConsentModel.find({ "usuario.id": id })
 
         let sendConsent = []
 
@@ -984,196 +985,9 @@ UserCtrl.getEnterprisetreatment = async (req, res) => {
     }
 }
 
-/********************* 
-//Exportar data
-UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
-    let enterpriseId = req.params.enterpriseId
-    let userId = req.params.userId
-    let type = req.params.type
 
 
-    let enterprise = await EnterpriseModel.findById(enterpriseId)
-
-    if (!enterprise) {
-        res.status(400).send({
-            status: false,
-            message: "No existe la empresa"
-        })
-    } else {
-
-
-        let user = await UserModel.findById(userId)
-
-
-        if (!user) {
-
-
-            res.status(400).send({
-                status: false,
-                message: "No existe el usuario"
-            })
-
-        } else {
-
-            let date = Date()
-            let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
-
-            const d = new Date(strTime);
-            let consents = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
-
-         
-
-            
-
-            let permisos = consents[0].permisos[0].data
-
-            let data = consents[0].data
-
-            let send_1 = []
-
-            let contador_2 = 0
-
-            let arrayPermisos = []
-
-            let name = consents[0].empresa.name  
-
-            for(var i = 0; i < permisos.length;i++){
-
-                for(var j = 0; j < data.length;j++){
-
-                    if(permisos[i] === data[j].tipo){
-
-                        arrayPermisos.push(1)
-                         
-                        
-                        
-                    }else{
-                        arrayPermisos.push(0)
-                    }
-
-                    contador_2 = contador_2 + 1
-
-
-                }
-
-                send_1[i] = {
-                    name:  name,
-                    permisos: arrayPermisos
-                }
-
-                arrayPermisos = []
-            }
-
-            console.log("sasa",send_1)
-
-
-
-            
-            let send = []
-
-            let contador  = 0
-
-            for(var i = 0; i < consents.length ;i++){
-
-                let consent = consents[i]
-
-                for(var j = 0; j < consent.data.length;j++){
-                    
-                    send[contador] = {
-                        tipo:  consent.data[j].tipo,
-                        valor:  consent.data[j].valor
-    
-                    }
-
-                    contador = contador + 1
-
-
-                }
-
-               
-
-              
-            }
-            
-
-            console.log(send)
-
-
-
-           
-
-
-
-            if (consents.length > 0) {
-
-
-                if (type === "xlsx") {
-
-                    var temp = JSON.stringify(send);
-
-                    var workbook = aspose.cells.Workbook()
-
-                    // access default empty worksheet
-                    var worksheet = workbook.getWorksheets().get(0)
-
-                    // set JsonLayoutOptions for formatting
-                    var layoutOptions = aspose.cells.JsonLayoutOptions()
-                    layoutOptions.setArrayAsTable(true)
-
-                    // import JSON data to default worksheet starting at cell A1
-                    aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
-
-                    // save resultant file
-                    workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
-
-                    res.download("output.xlsx")
-
-
-
-                } else if (type === "csv") {
-
-                    var temp = JSON.stringify(blockchainSend);
-
-                    var workbook = aspose.cells.Workbook()
-
-                    // access default empty worksheet
-                    var worksheet = workbook.getWorksheets().get(0)
-
-                    // set JsonLayoutOptions for formatting
-                    var layoutOptions = aspose.cells.JsonLayoutOptions()
-                    layoutOptions.setArrayAsTable(true)
-
-                    // import JSON data to default worksheet starting at cell A1
-                    aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
-
-                    // save resultant file
-                    workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
-
-                    res.download("output.csv")
-
-
-                } else {
-                    res.status(400).send({
-                        status: true,
-                        message: "No existe la extensión del archivo solicitada"
-                    })
-                }
-            } else {
-                res.status(400).send({
-                    status: true,
-                    message: "No existen usuarios"
-                })
-            }
-        }
-
-
-
-
-    }
-
-}
-*/
 
 //Actualziar tratamiento
 
@@ -1759,13 +1573,285 @@ UserCtrl.getHistory = async (req, res) => {
 
         res.send(sendConsent)
 
-        
-        
+
+
 
 
     }
 }
 
+/*
+
+//Exportar data
+UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
+
+    let enterpriseId = req.params.enterpriseId
+    let userId = req.params.userId
+    let type = req.params.type
+
+
+    let enterprise = await EnterpriseModel.findById(enterpriseId)
+
+    if (!enterprise) {
+        res.status(400).send({
+            status: false,
+            message: "No existe la empresa"
+        })
+    } else {
+
+
+        let user = await UserModel.findById(userId)
+
+
+        if (!user) {
+
+
+            res.status(400).send({
+                status: false,
+                message: "No existe el usuario"
+            })
+
+        } else {
+
+            let date = Date()
+            let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
+
+            const d = new Date(strTime);
+            
+
+
+            //console.log("consentimientos",consents.length)
+
+
+
+
+            //console.log(permisosAux)
+
+
+
+          
+
+            
+
+
+            let consents = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
+
+
+            
+            let send_1 = []
+
+
+
+            let arrayPermisos = []
+
+
+            let arrayPermisosAux = []
+
+            let arrayPermisosAux2 = []
+
+            let dataPermisos =[]
+
+
+
+
+            let send = []
+
+            let contador = 0
+
+            let contador2 = 0
+
+            let permiso;
+
+            let nombrePermiso = []
+
+            let send_3 = []
+
+            for (var i = 0; i < consents.length; i++) {
+
+                
+
+                
+                
+                let consent = consents[i]
+
+                for (var j = 0; j < consent.data.length; j++) {
+
+
+
+                    send[contador] = {
+                        tipo: consent.data[j].tipo,
+                        valor: consent.data[j].valor,
+                        empresa: consent.empresa.name,
+
+                    }
+
+                    contador = contador + 1
+
+                    
+
+                }
+
+                contador = 0
+
+                //console.log("send + i",send, i)
+
+                for (var k = 0; k < consent.permisos.length; k++) {
+
+                    dataPermisos[k] = consent.permisos[k].data
+
+
+                    permiso = consent.permisos[k].tipo
+
+                    //nombrePermiso.push(permiso)
+
+
+                    for (var l = 0; l < consent.data.length; l++) {
+
+
+
+                        if (dataPermisos[k].includes(consent.data[l].tipo)) {
+
+
+                            arrayPermisos.push(1)
+                            nombrePermiso.push(permiso)
+
+                        } else {
+                            arrayPermisos.push(0)
+                            nombrePermiso.push(permiso)
+                        }
+
+                        
+
+
+                    }
+
+                
+
+                    arrayPermisosAux[contador2] = arrayPermisos
+                    arrayPermisosAux2[contador2] = nombrePermiso
+
+                    arrayPermisos = []
+                    nombrePermiso = []
+                    contador2 =  contador2+1
+
+
+
+                }
+
+                //console.log("hola",arrayPermisosAux2)
+
+                for(var n = 0;n < arrayPermisosAux.length; n++){
+
+                    send_1[n] = {
+                        
+                        send:send,
+                        permisos: arrayPermisosAux[n],
+                        tratamientos: arrayPermisosAux2[n]
+
+                    }
+    
+                    
+                }
+
+
+                send = []
+    
+                contador2 = 0
+
+                send_3[i] = {send_1}
+                
+
+                arrayPermisosAux =[]
+                arrayPermisosAux2 = []
+
+                send_1 =[]
+
+            }
+
+
+            
+    
+
+
+
+
+
+
+
+
+
+        if (consents.length > 0) {
+
+
+
+            if(type === "xlsx"){
+
+
+             
+                
+
+                var temp = JSON.stringify(send_3);
+
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.xlsx")
+
+
+
+
+            } else if (type === "csv") {
+                var temp = JSON.stringify(send_3);
+
+                var workbook = aspose.cells.Workbook()
+
+                // access default empty worksheet
+                var worksheet = workbook.getWorksheets().get(0)
+
+                // set JsonLayoutOptions for formatting
+                var layoutOptions = aspose.cells.JsonLayoutOptions()
+                layoutOptions.setArrayAsTable(true)
+
+                // import JSON data to default worksheet starting at cell A1
+                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                // save resultant file
+                workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+
+                res.download("output.csv")
+
+            } else {
+                res.status(400).send({
+                    status: true,
+                    message: "No existe la extensión del archivo solicitada"
+                })
+            }
+        } else {
+            res.status(400).send({
+                status: true,
+                message: "No existen usuarios"
+            })
+        }
+    }
+
+
+
+
+}
+
+}*/
 
 module.exports = UserCtrl;
 

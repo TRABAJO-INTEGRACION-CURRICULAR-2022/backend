@@ -51,7 +51,7 @@ router.get('/getTreatmentEnterprise/:id', userCtrl.getEnterprisetreatment)
 //Exportar data por usuario y por empresa
 
 
-/*router.get("/exportAllEnterpriseAndUser/:enterpriseId/:userId/:type",UserCtrl.exportAllEnterpriseAndUser)*/
+router.get("/exportAllEnterpriseAndUser/:enterpriseId/:userId/:type",UserCtrl.exportAllEnterpriseAndUser)
 
 //borrar consentimeinto
 

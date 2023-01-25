@@ -45,17 +45,17 @@ router.get("/getTreatments/:id", enterpriseCtrl.getTreatments)
 router.get("/getTreatment/:id", enterpriseCtrl.getTreatment)
 
 //descargar historial
-/*
+
 router.get("/exportData/:enterpriseId/:userId/:type", enterpriseCtrl.exportDatabyUser)
 
-router.get("/exportDatabyTreatment/:enterpriseId/:treatment/:type", enterpriseCtrl.exportDatabyTreatment)*/
+router.get("/exportDatabyTreatment/:enterpriseId/:treatment/:type", enterpriseCtrl.exportDatabyTreatment)
 
 //Filtrar usuarios por tratamiento
 router.get("/getUsersByTreatment/:enterpriseId/:treatment", enterpriseCtrl.getUsersByTreatment)
 
 //Exportar todo empresa
 
-/*router.get("/exportAllEnterprise/:enterpriseId/:type", enterpriseCtrl.exportAllEnterprise)*/
+router.get("/exportAllEnterprise/:enterpriseId/:type", enterpriseCtrl.exportAllEnterprise)
 
 //Obtener blockchain
 
