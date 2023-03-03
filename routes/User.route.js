@@ -28,7 +28,7 @@ router.get('/emails/:id',authToken, userCtrl.getEmails)
 router.get('/email/:id', userCtrl.getEmail)
 
 //aceptar todos los permios
-router.put('/aceptAll/:id',userCtrl.acceptAllConsent)
+//router.put('/aceptAll/:id',userCtrl.acceptAllConsent)
 
 
 //rechazar todos lso permisos

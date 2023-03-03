@@ -8,9 +8,10 @@ const BlockchainModal = require('../model/Blockchain.modal');
 const ConsentModel = require('../model/Consent.model');
 const TreatmentModel = require('../model/Treatment.model');
 var XLSX = require('xlsx');
-const fs = require("fs")
-/*var aspose = aspose || {};
-aspose.cells = require("aspose.cells");*/
+
+var aspose = aspose || {};
+aspose.cells = require("aspose.cells");
+const fs = require('fs');
 //var aspose = aspose || {};
 //aspose.cells = require("aspose.cells");
 
@@ -236,7 +237,7 @@ EnterpriseCtrl.sendEmail = async (req, res) => {
 
 
 //Coger solo los emails respondidos y los permisos
-
+/*
 EnterpriseCtrl.getUsers = async (req, res) => {
 
     console.log(req.params.id)
@@ -256,7 +257,7 @@ EnterpriseCtrl.getUsers = async (req, res) => {
 
 
 }
-
+*/
 //Login
 
 EnterpriseCtrl.login = async (req, res) => {
@@ -521,7 +522,7 @@ EnterpriseCtrl.getTreatment = async (req, res) => {
 }
 
 
-/*
+
 //Exportar historial de usuario
 
 EnterpriseCtrl.exportDatabyUser = async (req, res) => {
@@ -549,7 +550,7 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
         } else {
 
 
-            let consents = await ConsentModel.find({ "usuario.id": userId, "empresa.id": enterpriseId })
+            let consents = await ConsentModel.find({ "usuario.id": userId, "empresa.id": enterpriseId, activo: true })
 
             let send_1 = []
 
@@ -578,6 +579,22 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
             let nombrePermiso = []
 
             let send_3 = []
+
+            let consenToJason = []
+
+            for(var i = 0; i < consents.length; i++){
+
+                const empresa = await EnterpriseModel.findById(consents[i].empresa.id)
+                consenToJason[i] = {
+                    nameEmpresa: empresa.nombreEmpresa,
+                    emailEmpresa: empresa.email,
+                    data: consents[i].data,
+                    permisos: consents[i].permisos,
+                    fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto
+
+                }
+            }
+
 
             for (var i = 0; i < consents.length; i++) {
 
@@ -718,7 +735,7 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
             } else if (type === "csv") {
 
                 
-                var temp = JSON.stringify(blockchainSend);
+                var temp = JSON.stringify(send_3);
 
                 var workbook = aspose.cells.Workbook()
 
@@ -738,6 +755,12 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
                 res.download("output.csv")
 
 
+            }else if(type === "json"){
+                const fileName = "output.json"
+                const heroeToJson = JSON.stringify(consenToJason)
+                fs.writeFileSync(fileName, heroeToJson)
+
+                res.download("output.json")
             } else {
                 res.status(400).send({
                     status: true,
@@ -805,6 +828,21 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
         let nombrePermiso = []
 
         let send_3 = []
+
+        let consenToJason = []
+
+        for(var i = 0; i < consents.length; i++){
+
+            const empresa = await EnterpriseModel.findById(consents[i].empresa.id)
+            consenToJason[i] = {
+                nameEmpresa: empresa.nombreEmpresa,
+                emailEmpresa: empresa.email,
+                data: consents[i].data,
+                permisos: consents[i].permisos,
+                fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto
+
+            }
+        }
 
         for (var i = 0; i < consents.length; i++) {
 
@@ -954,7 +992,13 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
                 res.download("output.csv")
 
 
-        } else {
+        } else if(type === "json"){
+            const fileName = "output.json"
+            const heroeToJson = JSON.stringify(consenToJason)
+            fs.writeFileSync(fileName, heroeToJson)
+
+            res.download("output.json")
+        }else {
             res.status(400).send({
                 status: true,
                 message: "No existe la extensión del archivo solicitada"
@@ -988,15 +1032,11 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
         let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
         const d = new Date(strTime);
-        let consents = await ConsentModel.find({ "empresa.id": enterpriseId })
+        let consents = await ConsentModel.find({ "empresa.id": enterpriseId, activo: true })
 
 
         
-
-
-        if (consents.length > 0) {
-
-            let send_1 = []
+        let send_1 = []
 
 
 
@@ -1023,6 +1063,21 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
             let nombrePermiso = []
 
             let send_3 = []
+
+            let consenToJason = []
+
+            for(var i = 0; i < consents.length; i++){
+
+                const empresa = await EnterpriseModel.findById(consents[i].empresa.id)
+                consenToJason[i] = {
+                    nameEmpresa: empresa.nombreEmpresa,
+                    emailEmpresa: empresa.email,
+                    data: consents[i].data,
+                    permisos: consents[i].permisos,
+                    fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto
+
+                }
+            }
 
             for (var i = 0; i < consents.length; i++) {
 
@@ -1127,10 +1182,26 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
             }
 
 
+            
+    
 
-            if (type === "xlsx") {
 
 
+
+
+
+
+
+
+        if (consents.length > 0) {
+
+
+
+            if(type === "xlsx"){
+
+
+             
+                
 
                 var temp = JSON.stringify(send_3);
 
@@ -1150,8 +1221,11 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
                 workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
 
                 res.download("output.xlsx")
-            } else if (type === "csv") {
 
+
+
+
+            } else if (type === "csv") {
                 var temp = JSON.stringify(send_3);
 
                 var workbook = aspose.cells.Workbook()
@@ -1171,8 +1245,18 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
 
                 res.download("output.csv")
 
+            } else if(type==="json"){
 
-            } else {
+           
+
+                const fileName = "output.json"
+                const heroeToJson = JSON.stringify(consenToJason)
+                fs.writeFileSync(fileName, heroeToJson)
+
+                res.download("output.json")
+
+
+            }else {
                 res.status(400).send({
                     status: true,
                     message: "No existe la extensión del archivo solicitada"
@@ -1185,9 +1269,10 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
             })
         }
 
+       
     }
 
-}*/
+}
 
 //Filtro  por tratamiento
 
@@ -1275,41 +1360,13 @@ EnterpriseCtrl.getBlockChain = async (req, res) => {
 
             let blockchain = await BlockchainModal.find({ enterpriseId: enterpriseId, userId: userId })
 
-            let body = []
+          
 
 
             if (blockchain.length > 0) {
 
 
-                /*let body = [];
-                for(var i = 0; i < blockchain.length; i++){
-                    body[i] =  JSON.parse(blockchain[i].body)
-                    //console.log("body", body)
-                    //blockchain[i].body = body
-                   // blockchain.body_enterprise = body_enterprise
-
-                }*/
-
-                /* let prueba = [
-                     {
-                       _id: new ObjectId("63b647c5b3107e66230a14ca"),
-                       hashMain: 'b3f0e069b36e8632e8b40245d1811499f00945810cf3febe9b2e8b0d61e3bb62',
-                       hashEnterprise: '302113f89c075cbc4844c36c5700b9c68fb480593d48952aabcbe3259e072514',
-                       previousHashMain: null,
-                       previousHashEnterprise: null,
-                       heigh: 0,
-                       heighEnterprise: 0,
-                       body: '{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}',
-                       data: [ [Object], [Object], [Object] ],
-                       permisos: [ [Object], [Object] ],
-                       userId: new ObjectId("63b362dcb6d5635be00ea1a1"),
-                       enterpriseId: new ObjectId("63b362d8b6d5635be00ea19e"),
-                       fechaModificacion: '1/4/2023, 10:45:09 PM',
-                       __v: 0
-                     }
-                   ]*/
-
-                //const s =  `{"hashMain":null,"hashEnterprise":null,"previousHashMain":null,"previousHashEnterprise":null,"heigh":0,"heighEnterprise":0,"body":null,"data":[{"tipo":"name","valor":"Boris","_id":"63b36389b6d5635be00ea1ac"},{"tipo":"lastName","valor":"Caiza","_id":"63b36389b6d5635be00ea1ad"},{"tipo":"phone","valor":"0991320401","_id":"63b36389b6d5635be00ea1ae"}],"permisos":[{"tipo":"Facturación Electronica2","valor":true,"data":["name","lastname"],"_id":"63b647c5b3107e66230a14ce"},{"tipo":"Machine Learning","valor":false,"descripcion":"Permiso para machine learning","data":["name","lastname"],"_id":"63b647c5b3107e66230a14cf"}],"userId":"63b362dcb6d5635be00ea1a1","enterpriseId":"63b362d8b6d5635be00ea19e","fechaModificacion":"1/4/2023, 10:45:09 PM","_id":"63b647c5b3107e66230a14ca"}`
+               
 
                 console.log("holi", blockchain)
 

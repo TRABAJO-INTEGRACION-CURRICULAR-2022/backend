@@ -12,8 +12,9 @@ const { findById } = require('../model/Email.model');
 const BlockchainModal = require('../model/Blockchain.modal');
 var XLSX = require('xlsx');
 const { RIPEMD160, TripleDES } = require('crypto-js');
-//var aspose = aspose || {};
-//aspose.cells = require("aspose.cells");
+var aspose = aspose || {};
+const fs = require('fs');
+aspose.cells = require("aspose.cells");
 //var json2xlsx = require('node-json-xlsx');
 
 
@@ -227,20 +228,7 @@ UserCtrl.updateUser = async (req, res) => {
 
                     const cadena = await BlockchainModel.find();
 
-                    const blockNew = new BlockchainModel({
-                        hashMain: null,
-                        hashEnterprise: null,
-                        previousHashEnterprise: null,
-                        previousHashMain: null,
-                        heigh: cadena.length,
-                        body: null,
-                        data: consentimiento[i].data,
-                        permisos: consentimiento[i].permisos,
-                        userId: consentimiento[i].usuario.id,
-                        enterpriseId: consentimiento[i].empresa.id,
-                        fechaModificacion: strTime
-
-                    })
+                    
 
                     const idEmpresa = consentimiento[i].empresa.id
 
@@ -274,39 +262,31 @@ UserCtrl.updateUser = async (req, res) => {
                         heighEnterprise = 0
                     }
 
+                    const blockNew = new BlockchainModel({
+                        hashMain: null,
+                        hashEnterprise: null,
+                        previousHashEnterprise: hashEmpresaAnterior,
+                        previousHashMain:bloqueAnterior.hashMain,
+                        heigh: cadena.length,
+                        body: null,
+                        body_enterprise: null,
+                        data: consentimiento[i].data,
+                        permisos: consentimiento[i].permisos,
+                        userId: consentimiento[i].usuario.id,
+                        enterpriseId: consentimiento[i].empresa.id,
+                        fechaModificacion: strTime
 
-                    const block = new Block({ data: blockNew });
-                    const hashEnterprise = strTime + consentimiento[i].empresa.id
-                    block.hashMain = SHA256(JSON.stringify(block)).toString();
-                    block.hashEnterprise = SHA256(JSON.stringify(hashEnterprise)).toString();
-                    block.height = cadena.length
-                    block.heighEnterprise = heighEnterprise
-                    block.permisos = consentimiento[i].permisos
-                    block.data = consentimiento[i].data
-                    block.userId = consentimiento[i].usuario.id
-                    block.enterpriseId = consentimiento[i].empresa.id
-                    block.fechaModificacion = strTime
-                    block.previousHashEnterprise = hashEmpresaAnterior
-                    block.previousHashMain = bloqueAnterior.hashMain
-
-
-
+                    })
 
 
+                     let body = JSON.stringify(blockNew)
 
+                        blockNew.body = body
 
-                    blockNew.hashMain = block.hashMain
-                    blockNew.hashEnterprise = block.hashEnterprise
-                    blockNew.previousHashMain = block.previousHashMain
-                    blockNew.previousHashEnterprise = block.previousHashEnterprise
-                    blockNew.heigh = block.height
-                    blockNew.heighEnterprise = block.heighEnterprise
-                    blockNew.body = block.body
-                    blockNew.permisos = block.permisos
-                    blockNew.data = block.data
-                    blockNew.userId = block.userId
-                    blockNew.enterpriseId = block.enterpriseId
-                    blockNew.fechaModificacion = strTime
+                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id + blockNew)
+                        blockNew.body_enterprise = hashEnterprise
+                        blockNew.hashMain = SHA256((body)).toString();
+                        blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
 
 
 
@@ -393,7 +373,7 @@ UserCtrl.getEmails = async (req, res) => {
         })
     }
 }
-
+//Obtener un email especifico
 UserCtrl.getEmail = async (req, res) => {
     var id = req.params.id
 
@@ -477,7 +457,7 @@ UserCtrl.acceptConsent = async (req, res) => {
 
                         blockNew.body = body
 
-                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
+                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id + blockNew)
                         blockNew.body_enterprise = hashEnterprise
                         blockNew.hashMain = SHA256((body)).toString();
                         blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -585,7 +565,7 @@ UserCtrl.acceptConsent = async (req, res) => {
 
                         blockNew.body = body
 
-                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id)
+                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id + blockNew)
                         blockNew.body_enterprise = hashEnterprise
                         blockNew.hashMain = SHA256((body)).toString();
                         blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -656,7 +636,7 @@ UserCtrl.acceptConsent = async (req, res) => {
     }
 
 }
-
+/*
 //Aceptar algunos consentimientos
 UserCtrl.acceptAllConsent = async (req, res) => {
 
@@ -907,7 +887,7 @@ UserCtrl.acceptAllConsent = async (req, res) => {
         })
     }
 
-}
+}*/
 
 //Rechazar todo el consentimeinto
 UserCtrl.rejectAllConsent = async (req, res) => {
@@ -984,10 +964,6 @@ UserCtrl.getEnterprisetreatment = async (req, res) => {
         })
     }
 }
-
-
-
-
 
 //Actualziar tratamiento
 
@@ -1089,7 +1065,7 @@ UserCtrl.updateTreatmente = async (req, res) => {
 
             blockNew.body = body
 
-            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id + blockNew)
             blockNew.body_enterprise = hashEnterprise
             blockNew.hashMain = SHA256((body)).toString();
             blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -1204,7 +1180,7 @@ UserCtrl.deleteConsent = async (req, res) => {
 
         blockNew.body = body
 
-        const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+        const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id + blockNew)
         blockNew.body_enterprise = hashEnterprise
         blockNew.hashMain = SHA256((body)).toString();
         blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -1397,7 +1373,7 @@ UserCtrl.updateData = async (req, res) => {
 
                 blockNew.body = body
 
-                const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+                const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id +blockNew)
                 blockNew.body_enterprise = hashEnterprise
                 blockNew.hashMain = SHA256((body)).toString();
                 blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -1523,7 +1499,7 @@ UserCtrl.updateDateEndConsent = async (req, res) => {
 
             blockNew.body = body
 
-            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id)
+            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id +blockNew)
             blockNew.body_enterprise = hashEnterprise
             blockNew.hashMain = SHA256((body)).toString();
             blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -1580,9 +1556,10 @@ UserCtrl.getHistory = async (req, res) => {
     }
 }
 
-/*
-
 //Exportar data
+
+
+
 UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
     let enterpriseId = req.params.enterpriseId
@@ -1665,6 +1642,21 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
             let nombrePermiso = []
 
             let send_3 = []
+
+            let consenToJason = []
+
+            for(var i = 0; i < consents.length; i++){
+
+                const empresa = await EnterpriseModel.findById(consents[i].empresa.id)
+                consenToJason[i] = {
+                    nameEmpresa: empresa.nombreEmpresa,
+                    emailEmpresa: empresa.email,
+                    data: consents[i].data,
+                    permisos: consents[i].permisos,
+                    fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto
+
+                }
+            }
 
             for (var i = 0; i < consents.length; i++) {
 
@@ -1832,7 +1824,18 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
                 res.download("output.csv")
 
-            } else {
+            } else if(type==="json"){
+
+           
+
+                const fileName = "output.json"
+                const heroeToJson = JSON.stringify(consenToJason)
+                fs.writeFileSync(fileName, heroeToJson)
+
+                res.download("output.json")
+
+
+            }else {
                 res.status(400).send({
                     status: true,
                     message: "No existe la extensión del archivo solicitada"
@@ -1851,7 +1854,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
 }
 
-}*/
+}
 
 module.exports = UserCtrl;
 

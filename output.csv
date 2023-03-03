@@ -1,12 +1,10 @@
-Tipo,send,,,permisos
-,tipo,valor,empresa,
-Facturacion Electronica,name,Hernan,Pichincha,1
-,lastname,Andrade,Pichincha,1
-,phone,099999999,Pichincha,0
-Marketing,name,Hernan,Pichincha,1
-,lastname,Andrade,Pichincha,1
-,phone,099999999,Pichincha,1
-,name,Mateo,quito,
-,lastname,Andrade,quito,
-,phone,099999999,quito,
+send_1,,,,
+send,,,permisos,tratamientos
+tipo,valor,empresa,,
+name,David,empresa1,1,Facturación Electrónica
+lastName,Caiza,empresa1,1,Facturación Electrónica
+ci,2222222222,empresa1,1,Facturación Electrónica
+email,caizad@hotmail.com,empresa1,1,Facturación Electrónica
+genero,Masculino,empresa1,0,Facturación Electrónica
+telefono,099999999,empresa1,0,Facturación Electrónica
 Evaluation Only. Created with Aspose.Cells for Node.js via Java.Copyright 2003 - 2023 Aspose Pty Ltd.
