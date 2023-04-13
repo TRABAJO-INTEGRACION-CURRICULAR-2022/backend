@@ -1,10 +1,7 @@
 send_1,,,,
 send,,,permisos,tratamientos
 tipo,valor,empresa,,
-name,David,empresa1,1,Facturación Electrónica
-lastName,Caiza,empresa1,1,Facturación Electrónica
-ci,2222222222,empresa1,1,Facturación Electrónica
-email,caizad@hotmail.com,empresa1,1,Facturación Electrónica
-genero,Masculino,empresa1,0,Facturación Electrónica
-telefono,099999999,empresa1,0,Facturación Electrónica
+name,Boris,Responsable 1,1,Facturación Electrónica
+lastName,Jiménez,Responsable 1,1,Facturación Electrónica
+email,boris.caiza@epn.edu.ec,Responsable 1,1,Facturación Electrónica
 Evaluation Only. Created with Aspose.Cells for Node.js via Java.Copyright 2003 - 2023 Aspose Pty Ltd.

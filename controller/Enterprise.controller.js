@@ -582,14 +582,42 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
 
             let consenToJason = []
 
+           
+
             for(var i = 0; i < consents.length; i++){
 
+                let dataAux = []
+                for(var l = 0; l < consents[i].data.length ; l++){
+                    dataAux[l] ={
+                        tipo: consents[i].data[l].tipo,
+                        valor: consents[i].data[l].valor
+                    }
+                }
+
+                //console.log("este es la data", dataAux)
+
+                let permisosAux = []
+                
+                for(var l = 0; l < consents[i].permisos.length ; l++){
+                    permisosAux[l] ={
+                        tipo: consents[i].permisos[l].tipo,
+                        valor: consents[i].permisos[l].valor,
+                        descripcion: consents[i].permisos[l].descripcion,
+                        data: consents[i].permisos[l].data
+
+                    }
+                }
+
+                //console.log(permisosAux)
+
+
                 const empresa = await EnterpriseModel.findById(consents[i].empresa.id)
+                //console.log(empresa)
                 consenToJason[i] = {
-                    nameEmpresa: empresa.nombreEmpresa,
+                    nameEmpresa: empresa.name,
                     emailEmpresa: empresa.email,
-                    data: consents[i].data,
-                    permisos: consents[i].permisos,
+                    data: dataAux,
+                    permisos: permisosAux,
                     fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto
 
                 }
@@ -758,6 +786,7 @@ EnterpriseCtrl.exportDatabyUser = async (req, res) => {
             }else if(type === "json"){
                 const fileName = "output.json"
                 const heroeToJson = JSON.stringify(consenToJason)
+                console.log("sasasa",heroeToJson)
                 fs.writeFileSync(fileName, heroeToJson)
 
                 res.download("output.json")
@@ -833,16 +862,43 @@ EnterpriseCtrl.exportDatabyTreatment = async (req, res) => {
 
         for(var i = 0; i < consents.length; i++){
 
+            let dataAux = []
+            for(var l = 0; l < consents[i].data.length ; l++){
+                dataAux[l] ={
+                    tipo: consents[i].data[l].tipo,
+                    valor: consents[i].data[l].valor
+                }
+            }
+
+            //console.log("este es la data", dataAux)
+
+            let permisosAux = []
+            
+            for(var l = 0; l < consents[i].permisos.length ; l++){
+                permisosAux[l] ={
+                    tipo: consents[i].permisos[l].tipo,
+                    valor: consents[i].permisos[l].valor,
+                    descripcion: consents[i].permisos[l].descripcion,
+                    data: consents[i].permisos[l].data
+
+                }
+            }
+
+            //console.log(permisosAux)
+
+
             const empresa = await EnterpriseModel.findById(consents[i].empresa.id)
+            //console.log(empresa)
             consenToJason[i] = {
-                nameEmpresa: empresa.nombreEmpresa,
+                nameEmpresa: empresa.name,
                 emailEmpresa: empresa.email,
-                data: consents[i].data,
-                permisos: consents[i].permisos,
+                data: dataAux,
+                permisos: permisosAux,
                 fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto
 
             }
         }
+
 
         for (var i = 0; i < consents.length; i++) {
 
@@ -1068,12 +1124,38 @@ EnterpriseCtrl.exportAllEnterprise = async (req, res) => {
 
             for(var i = 0; i < consents.length; i++){
 
+                let dataAux = []
+                for(var l = 0; l < consents[i].data.length ; l++){
+                    dataAux[l] ={
+                        tipo: consents[i].data[l].tipo,
+                        valor: consents[i].data[l].valor
+                    }
+                }
+
+                //console.log("este es la data", dataAux)
+
+                let permisosAux = []
+                
+                for(var l = 0; l < consents[i].permisos.length ; l++){
+                    permisosAux[l] ={
+                        tipo: consents[i].permisos[l].tipo,
+                        valor: consents[i].permisos[l].valor,
+                        descripcion: consents[i].permisos[l].descripcion,
+                        data: consents[i].permisos[l].data
+
+                    }
+                }
+
+                //console.log(permisosAux)
+
+
                 const empresa = await EnterpriseModel.findById(consents[i].empresa.id)
+                //console.log(empresa)
                 consenToJason[i] = {
-                    nameEmpresa: empresa.nombreEmpresa,
+                    nameEmpresa: empresa.name,
                     emailEmpresa: empresa.email,
-                    data: consents[i].data,
-                    permisos: consents[i].permisos,
+                    data: dataAux,
+                    permisos: permisosAux,
                     fechaFinConsentimeinto: consents[i].fechaFinConsentimeinto
 
                 }
