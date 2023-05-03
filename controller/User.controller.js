@@ -15,6 +15,9 @@ const { RIPEMD160, TripleDES } = require('crypto-js');
 var aspose = aspose || {};
 const fs = require('fs');
 aspose.cells = require("aspose.cells");
+const {generarLlave, cifradoA, decifradoA} = require("../helpers/cifrado")
+
+
 //var json2xlsx = require('node-json-xlsx');
 
 
@@ -228,7 +231,7 @@ UserCtrl.updateUser = async (req, res) => {
 
                     const cadena = await BlockchainModel.find();
 
-                    
+
 
                     const idEmpresa = consentimiento[i].empresa.id
 
@@ -266,7 +269,7 @@ UserCtrl.updateUser = async (req, res) => {
                         hashMain: null,
                         hashEnterprise: null,
                         previousHashEnterprise: hashEmpresaAnterior,
-                        previousHashMain:bloqueAnterior.hashMain,
+                        previousHashMain: bloqueAnterior.hashMain,
                         heigh: cadena.length,
                         body: null,
                         body_enterprise: null,
@@ -279,14 +282,14 @@ UserCtrl.updateUser = async (req, res) => {
                     })
 
 
-                     let body = JSON.stringify(blockNew)
+                    let body = JSON.stringify(blockNew)
 
-                        blockNew.body = body
+                    blockNew.body = body
 
-                        const hashEnterprise = JSON.stringify(strTime + email.empresa.id + blockNew)
-                        blockNew.body_enterprise = hashEnterprise
-                        blockNew.hashMain = SHA256((body)).toString();
-                        blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
+                    const hashEnterprise = JSON.stringify(strTime + email.empresa.id + blockNew)
+                    blockNew.body_enterprise = hashEnterprise
+                    blockNew.hashMain = SHA256((body)).toString();
+                    blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
 
 
 
@@ -433,8 +436,18 @@ UserCtrl.acceptConsent = async (req, res) => {
 
                 if (usuario) {
 
+                    let enterprise = await EnterpriseModel.findById(email.empresa.id)
+
+                    for(var i = 0; i < data.length; i++){
+
+                        data[i].valor = cifradoA(enterprise.key, data[i].valor)
+                            
+                    }
+
+
                     if (cadena.length === 0) {
 
+                       
                         const blockNew = new BlockchainModel({
                             hashMain: null,
                             hashEnterprise: null,
@@ -954,7 +967,16 @@ UserCtrl.getEnterprisetreatment = async (req, res) => {
 
     let consent = await ConsentModel.findById(idConsent)
 
+
+
     if (consent) {
+
+        let enterprise = await EnterpriseModel.findById(consent.empresa.id)
+
+        for(var i = 0; i < consent.data.length; i++){
+
+            consent.data[i].valor = decifradoA(enterprise.key,consent.data[i].valor)
+        }
 
         res.send(consent)
 
@@ -1115,7 +1137,7 @@ UserCtrl.deleteConsent = async (req, res) => {
 
         await consent.save()
 
-        await consent.save()
+       
 
 
         let actualConsent = await ConsentModel.findById(id)
@@ -1287,11 +1309,13 @@ UserCtrl.updateData = async (req, res) => {
 
 
             for (var k = 0; k < consent.length; k++) {
+                let enterprise = await EnterpriseModel.findById(consent[k].empresa.id)
                 let existingData = consent[k].data
                 for (var i = 0; i < existingData.length; i++) {
                     for (var j = 0; j < data.length; j++) {
                         if (existingData[i].tipo === data[j].tipo) {
-                            existingData[i].valor = data[j].valor
+                             
+                            existingData[i].valor = cifradoA(enterprise.key,data[j].valor)
                         }
 
                     }
@@ -1373,7 +1397,7 @@ UserCtrl.updateData = async (req, res) => {
 
                 blockNew.body = body
 
-                const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id +blockNew)
+                const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id + blockNew)
                 blockNew.body_enterprise = hashEnterprise
                 blockNew.hashMain = SHA256((body)).toString();
                 blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -1499,7 +1523,7 @@ UserCtrl.updateDateEndConsent = async (req, res) => {
 
             blockNew.body = body
 
-            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id +blockNew)
+            const hashEnterprise = JSON.stringify(strTime + actualConsent.empresa.id + blockNew)
             blockNew.body_enterprise = hashEnterprise
             blockNew.hashMain = SHA256((body)).toString();
             blockNew.hashEnterprise = SHA256((hashEnterprise)).toString();
@@ -1594,7 +1618,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
             let strTime = date.toLocaleString("en-US", { timeZone: "America/Bogota" });
 
             const d = new Date(strTime);
-            
+
 
 
             //console.log("consentimientos",consents.length)
@@ -1606,15 +1630,15 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
 
 
-          
 
-            
+
+
 
 
             let consents = await ConsentModel.find({ userId: userId, enterpriseId: enterpriseId })
 
 
-            
+
             let send_1 = []
 
 
@@ -1626,7 +1650,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
             let arrayPermisosAux2 = []
 
-            let dataPermisos =[]
+            let dataPermisos = []
 
 
 
@@ -1645,11 +1669,11 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
             let consenToJason = []
 
-            for(var i = 0; i < consents.length; i++){
+            for (var i = 0; i < consents.length; i++) {
 
                 let dataAux = []
-                for(var l = 0; l < consents[i].data.length ; l++){
-                    dataAux[l] ={
+                for (var l = 0; l < consents[i].data.length; l++) {
+                    dataAux[l] = {
                         tipo: consents[i].data[l].tipo,
                         valor: consents[i].data[l].valor
                     }
@@ -1658,9 +1682,9 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
                 //console.log("este es la data", dataAux)
 
                 let permisosAux = []
-                
-                for(var l = 0; l < consents[i].permisos.length ; l++){
-                    permisosAux[l] ={
+
+                for (var l = 0; l < consents[i].permisos.length; l++) {
+                    permisosAux[l] = {
                         tipo: consents[i].permisos[l].tipo,
                         valor: consents[i].permisos[l].valor,
                         descripcion: consents[i].permisos[l].descripcion,
@@ -1687,10 +1711,10 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
             for (var i = 0; i < consents.length; i++) {
 
-                
 
-                
-                
+
+
+
                 let consent = consents[i]
 
                 for (var j = 0; j < consent.data.length; j++) {
@@ -1706,7 +1730,7 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
                     contador = contador + 1
 
-                    
+
 
                 }
 
@@ -1739,19 +1763,19 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
                             nombrePermiso.push(permiso)
                         }
 
-                        
+
 
 
                     }
 
-                
+
 
                     arrayPermisosAux[contador2] = arrayPermisos
                     arrayPermisosAux2[contador2] = nombrePermiso
 
                     arrayPermisos = []
                     nombrePermiso = []
-                    contador2 =  contador2+1
+                    contador2 = contador2 + 1
 
 
 
@@ -1759,37 +1783,35 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
                 //console.log("hola",arrayPermisosAux2)
 
-                for(var n = 0;n < arrayPermisosAux.length; n++){
+                for (var n = 0; n < arrayPermisosAux.length; n++) {
 
                     send_1[n] = {
-                        
-                        send:send,
+
+                        send: send,
                         permisos: arrayPermisosAux[n],
                         tratamientos: arrayPermisosAux2[n]
 
                     }
-    
-                    
+
+
                 }
 
 
                 send = []
-    
+
                 contador2 = 0
 
-                send_3[i] = {send_1}
-                
+                send_3[i] = { send_1 }
 
-                arrayPermisosAux =[]
+
+                arrayPermisosAux = []
                 arrayPermisosAux2 = []
 
-                send_1 =[]
+                send_1 = []
 
             }
 
 
-            
-    
 
 
 
@@ -1799,89 +1821,118 @@ UserCtrl.exportAllEnterpriseAndUser = async (req, res) => {
 
 
 
-        if (consents.length > 0) {
+
+
+            if (consents.length > 0) {
 
 
 
-            if(type === "xlsx"){
-
-
-             
-                
-
-                var temp = JSON.stringify(send_3);
-
-                var workbook = aspose.cells.Workbook()
-
-                // access default empty worksheet
-                var worksheet = workbook.getWorksheets().get(0)
-
-                // set JsonLayoutOptions for formatting
-                var layoutOptions = aspose.cells.JsonLayoutOptions()
-                layoutOptions.setArrayAsTable(true)
-
-                // import JSON data to default worksheet starting at cell A1
-                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
-
-                // save resultant file
-                workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
-
-                res.download("output.xlsx")
+                if (type === "xlsx") {
 
 
 
 
-            } else if (type === "csv") {
-                var temp = JSON.stringify(send_3);
 
-                var workbook = aspose.cells.Workbook()
+                    var temp = JSON.stringify(send_3);
 
-                // access default empty worksheet
-                var worksheet = workbook.getWorksheets().get(0)
+                    var workbook = aspose.cells.Workbook()
 
-                // set JsonLayoutOptions for formatting
-                var layoutOptions = aspose.cells.JsonLayoutOptions()
-                layoutOptions.setArrayAsTable(true)
+                    // access default empty worksheet
+                    var worksheet = workbook.getWorksheets().get(0)
 
-                // import JSON data to default worksheet starting at cell A1
-                aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+                    // set JsonLayoutOptions for formatting
+                    var layoutOptions = aspose.cells.JsonLayoutOptions()
+                    layoutOptions.setArrayAsTable(true)
 
-                // save resultant file
-                workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+                    // import JSON data to default worksheet starting at cell A1
+                    aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
 
-                res.download("output.csv")
+                    // save resultant file
+                    workbook.save("output.xlsx", aspose.cells.SaveFormat.AUTO)
 
-            } else if(type==="json"){
-
-           
-
-                const fileName = "output.json"
-                const heroeToJson = JSON.stringify(consenToJason)
-                fs.writeFileSync(fileName, heroeToJson)
-
-                res.download("output.json")
+                    res.download("output.xlsx")
 
 
-            }else {
+
+
+                } else if (type === "csv") {
+                    var temp = JSON.stringify(send_3);
+
+                    var workbook = aspose.cells.Workbook()
+
+                    // access default empty worksheet
+                    var worksheet = workbook.getWorksheets().get(0)
+
+                    // set JsonLayoutOptions for formatting
+                    var layoutOptions = aspose.cells.JsonLayoutOptions()
+                    layoutOptions.setArrayAsTable(true)
+
+                    // import JSON data to default worksheet starting at cell A1
+                    aspose.cells.JsonUtility.importData(temp, worksheet.getCells(), 0, 0, layoutOptions)
+
+                    // save resultant file
+                    workbook.save("output.csv", aspose.cells.SaveFormat.AUTO)
+
+                    res.download("output.csv")
+
+                } else if (type === "json") {
+
+
+
+                    const fileName = "output.json"
+                    const heroeToJson = JSON.stringify(consenToJason)
+                    fs.writeFileSync(fileName, heroeToJson)
+
+                    res.download("output.json")
+
+
+                } else {
+                    res.status(400).send({
+                        status: true,
+                        message: "No existe la extensión del archivo solicitada"
+                    })
+                }
+            } else {
                 res.status(400).send({
                     status: true,
-                    message: "No existe la extensión del archivo solicitada"
+                    message: "No existen usuarios"
                 })
             }
-        } else {
-            res.status(400).send({
-                status: true,
-                message: "No existen usuarios"
-            })
         }
+
+
+
+
     }
 
+}
+
+
+
+UserCtrl.cifrado = async (req, res) => {
+
+   let llave = generarLlave("643ff86479afdff8758472d0")
+
+   console.log(llave)
+
+   let cifrado = cifradoA(llave,"prueba")
+
+
+   console.log(cifrado)
+
+
+  let decifrado = decifradoA(llave, cifrado)
+
+   console.log(decifrado)
+   
 
 
 
 }
 
-}
+
+
+
 
 module.exports = UserCtrl;
 

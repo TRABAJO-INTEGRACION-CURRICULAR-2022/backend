@@ -16,7 +16,7 @@ EmailCtrl.createEmail = async (req, res) => {
 
     if (emailUser) {
         res.json({
-            status: 'El correo ya existe o inválido'
+            status: 'El correo ya existe o es inválido'
         })
     }
     else {

@@ -84,4 +84,9 @@ router.get("/getHistory/:id", userCtrl.getHistory)
 router.put("/updateDateEndConsent/:id",userCtrl.updateDateEndConsent)
 
 
+//cifradp
+
+router.post("/cifrado", userCtrl.cifrado)
+
+
 module.exports = router

@@ -9,9 +9,12 @@ const ConsentModel = require('../model/Consent.model');
 const TreatmentModel = require('../model/Treatment.model');
 var XLSX = require('xlsx');
 
+const {generarLlave, cifradoA, decifradoA} = require("../helpers/cifrado")
+
 var aspose = aspose || {};
 aspose.cells = require("aspose.cells");
 const fs = require('fs');
+
 //var aspose = aspose || {};
 //aspose.cells = require("aspose.cells");
 
@@ -51,6 +54,12 @@ EnterpriseCtrl.createEnterprise = async (req, res) => {
                 })
 
                 await NewEnterprise.save();
+
+                let llave = generarLlave(NewEnterprise._id)
+
+                NewEnterprise.key = llave
+
+                await NewEnterprise.save()
 
                 res.json({
                     status: "Empresa Guardada"
@@ -300,6 +309,15 @@ EnterpriseCtrl.getUserConsent = async (req, res) => {
 
 
     if (consent) {
+
+        
+        let enterprise = await EnterpriseModel.findById(consent.empresa.id)
+
+        for(var i = 0; i < consent.data.length; i++){
+
+            consent.data[i].valor = decifradoA(enterprise.key,consent.data[i].valor)
+        }
+
         res.status(200).send({
             status: true,
             consent: consent,
